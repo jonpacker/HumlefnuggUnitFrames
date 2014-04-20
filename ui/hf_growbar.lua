@@ -32,18 +32,25 @@ local animateGlowOnChange = function(bar)
   local timeline = ANIMATION_MANAGER:CreateTimeline()
   timeline:InsertCallback(function()
     bar.glow:SetAlpha(bar.opts.glowMaxAlpha)
+    bar.glow:SetWidth(0)
   end, 0)
 
-  local disappear = timeline:InsertAnimation(ANIMATION_ALPHA, bar.glow, bar.opts.glowTime)
-  disappear:SetDuration(bar.opts.glowTime / 2)
+  local disappear = timeline:InsertAnimation(ANIMATION_ALPHA, bar.glow, 0)
+  disappear:SetDuration(bar.opts.glowTime)
   disappear:SetEasingFunction(bar.opts.glowEasing)
   disappear:SetAlphaValues(bar.opts.glowMaxAlpha, 0)
+
+  local expand = timeline:InsertAnimation(ANIMATION_SIZE, bar.glow, 0)
+  expand:SetDuration(bar.opts.changeTime)
+  expand:SetEasingFunction(bar.opts.changeEasing)
+  expand:SetStartAndEndWidth(0, 0)
+  expand:SetStartAndEndHeight(bar.opts.height, bar.opts.height)
 
   bar:on("update", function(value)
     if value == bar.value then return end
     timeline:Stop()
     widthDiff = value - bar.value
-    bar.glow:SetWidth(math.abs(widthDiff) * bar.opts.width)
+    expand:SetStartAndEndWidth(0, math.abs(widthDiff) * bar.opts.width)
     timeline:PlayFromStart()
   end)
 end
@@ -80,7 +87,7 @@ local defaults = {
   changeEasing = ZO_EaseOutQuintic; -- bar width transition easing function
   glowTime = 500; -- diff indicator display time in ms
   glowEasing = ZO_EaseInQuintic; -- diff indicator easing function
-  glowMaxAlpha = 0.6;  -- max alpha of diff indicator
+  glowMaxAlpha = 0.5;  -- max alpha of diff indicator
   height = 30; 
   width = 300;
 };
