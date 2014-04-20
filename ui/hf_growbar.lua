@@ -1,6 +1,10 @@
 HFGrowbar = {}
 HFGrowbar.__index = HFGrowbar
 
+local EASE_OUT_EXPO = function (t, b, c, d)
+  return c * ( -math.pow( 2, -10 * t/d ) + 1 ) + b;
+end
+
 local controlCounter = 0;
 local getUniqueName = function(hint)
   controlCounter = controlCounter + 1
@@ -20,7 +24,7 @@ local animateWidthChange = function(bar)
 
   bar:on("update", function(value)
     if value == bar.value then return end
-    fastForwardTimeline(timeline)
+    if timeline:IsPlaying() then timeline:PlayInstantlyToEnd() end
     timeline:PlayInstantlyToEnd()
     anim:SetStartAndEndWidth(bar.bar:GetWidth(), bar.opts.width * value)
     timeline:PlayFromStart()
@@ -40,7 +44,7 @@ local animateGlowOnChange = function(bar)
 
   bar:on("update", function(value)
     if value == bar.value then return end
-    fastForwardTimeline(timeline)
+    timeline:Stop()
     local widthDiff = math.abs(value - bar.value)
     bar.glow:SetWidth(widthDiff * bar.opts.width)
     timeline:PlayFromStart()
@@ -77,7 +81,7 @@ end
 -- bgColour ({r,g,b,a}): background colour (defualt is black)
 -- fgColour ({r,g,b,a}): foreground colour (default is white)
 -- changeTime (ms): amount of time bar takes to change (animation)  (default is 100)
--- easing (fn): easing function (default is ZO_BezierInEase)
+-- easing (fn): easing function (default is EASE_OUT_EXPO)
 -- width: width of bar
 -- height: height of bar
 function HFGrowbar:create(parent, opts)
@@ -90,7 +94,7 @@ function HFGrowbar:create(parent, opts)
   if opts.bgColour == nil then opts.bgColour = {0, 0, 0, 0.8} end
   if opts.fgColour == nil then opts.fgColour = {1, 1, 1, 1} end
   if opts.changeTime == nil then opts.changeTime = 100 end
-  if opts.easing == nil then opts.easing = ZO_BezierInEase end
+  if opts.easing == nil then opts.easing = EASE_OUT_EXPO end
   if opts.height == nil then opts.height = 30 end
   if opts.width == nil then opts.width = 300 end
 
