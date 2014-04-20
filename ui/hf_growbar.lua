@@ -59,7 +59,7 @@ local animateGlowOnChange = function(bar)
     if bar.bar:GetWidth() - widthDiff < 0 then
       widthDiff = bar.bar:GetWidth()
     end
-    expand:SetStartAndEndWidth(0, )
+    expand:SetStartAndEndWidth(0, widthDiff)
     timeline:PlayFromStart()
   end)
 end

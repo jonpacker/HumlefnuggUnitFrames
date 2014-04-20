@@ -12,6 +12,10 @@ function HFUF.init(eventCode, addOnName)
   -- config menu
   panel = LAM:CreateControlPanel("HFUFConfig", "Humlefnugg Unit Frames")
 
+  ZO_PlayerAttributeHealth:SetHidden(true)
+  ZO_PlayerAttributeMagicka:SetHidden(true)
+  ZO_PlayerAttributeStamina:SetHidden(true)
+
   HFUF:create(HFUFFrame)
 end
 
