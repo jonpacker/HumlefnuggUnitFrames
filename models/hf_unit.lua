@@ -16,8 +16,8 @@ local updateUnit = function(unit)
 
   unit.level = GetUnitLevel(unit.unit)
   unit.health, unit.healthMax, unit.healthEffectiveMax = GetUnitPower(unit.unit, POWERTYPE_HEALTH)
-  unit.hasMagicka = DoesUnitUsePowerType(unit.unit, POWERTYPE_MAGICKA)
-  unit.hasStamina = DoesUnitUsePowerType(unit.unit, POWERTYPE_STAMINA)
+  unit.hasMagicka = GetUnitPower(unit.unit, POWERTYPE_MAGICKA) ~= 0
+  unit.hasStamina = GetUnitPower(unit.unit, POWERTYPE_STAMINA) ~= 0
 
   if unit.hasStamina then
     unit.stamina, unit.staminaMax, unit.staminaEffectiveMax = GetUnitPower(unit.unit, POWERTYPE_STAMINA)
@@ -45,15 +45,15 @@ local listenForChanges = function(unit, changeEvent)
 
   if changeEvent then
     HFEventDelegate:on(changeEvent, function() 
-      unit:emit('change-identity')
       updateUnit(unit)
+      unit:emit('change-identity')
     end)
   end
 end
 
 local init = function(unit, changeEvent)
   listenForChanges(unit, changeEvent);
-  updateTarget(unit)
+  updateUnit(unit)
 end
 
 function HFUnitModel:get(unitName, changeEvent)

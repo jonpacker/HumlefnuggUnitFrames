@@ -3,12 +3,12 @@
 ## OptionalDependsOn: LibAddonMenu-1.0, LibStub
 ## SavedVariables: HFUFSettings
 
+HumlefnuggUnitFrames.lua
+HumlefnuggUnitFrames.xml
+
 libs/LibStub/LibStub.lua
 libs/LibAddonMenu-1.0/LibAddonMenu-1.0.lua
 libs/emitter.lua
-
-HumlefnuggUnitFrames.lua
-HumlefnuggUnitFrames.xml
 
 ui/hfuf_render.lua
 ui/hf_growbar.lua
@@ -17,3 +17,5 @@ ui/hf_unit_frame.lua
 events/hf_delegate.lua
 events/hf_unit.lua
 events/hf_state.lua
+
+models/hf_unit.lua

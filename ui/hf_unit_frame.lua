@@ -16,15 +16,15 @@ local updateIdentity = function(uf, parent)
   uf.container:SetHidden(false)
   uf.charName:SetText(uf.unit.name)
   uf.healthBar:update(uf.unit.health / uf.unit.healthMax, true)
-  uf.magickaBar:update(uf.unit.magicka / uf.unit.magickaMax, true)
-  uf.staminaBar:update(uf.unit.stamina / uf.unit.staminaMax, true)
+
+  if uf.unit.hasMagicka then uf.magickaBar:update(uf.unit.magicka / uf.unit.magickaMax, true) end
+  if uf.unit.hasStamina then uf.staminaBar:update(uf.unit.stamina / uf.unit.staminaMax, true) end
 end
 
 local render = function(uf, parent)
   local container = WINDOW_MANAGER:CreateControl(getUniqueName("container"), parent, CT_TEXTURE)
 
   container:SetColor(unpack(uf.opts.restingBg))
-  container:SetSimpleAnchorParent(0, 0)
 
   uf.container = container
 
@@ -37,7 +37,6 @@ local render = function(uf, parent)
     width = barWidth;
     height = uf.opts.healthHeight
   })
-  containerHeight = containerHeight + uf.opts.healthHeight
   uf.healthBar.container:SetAnchor(TOPLEFT, uf.container, TOPLEFT, uf.opts.padding, uf.opts.padding)
 
   if uf.unit.hasMagicka then
@@ -69,7 +68,7 @@ local render = function(uf, parent)
   charName:SetDimensions(barWidth / 2, uf.healthBar.opts.height)
   charName:SetSimpleAnchorParent(10, 0);
   charName:SetVerticalAlignment(TEXT_ALIGN_CENTER);
-  charName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.nameFont, math.floor(uf.opts.height / 4)))
+  charName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.nameFont, math.floor(uf.opts.healthHeight / 2)))
   charName:SetColor(1, 1, 1, 1);
   uf.charName = charName;
 
@@ -99,9 +98,9 @@ local listen = function(uf)
 end
 
 local defaults = {
-  healthHeight: 40,
-  magickaHeight: 25,
-  staminaHeight: 25,
+  healthHeight = 40;
+  magickaHeight = 25;
+  staminaHeight = 25;
   width = 360;
   padding = 2;
   restingBg = { 54/255, 54/255, 54/255, 0.8 };
