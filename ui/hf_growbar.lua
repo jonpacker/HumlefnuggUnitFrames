@@ -73,6 +73,19 @@ local render = function(bar, parent)
   animateGlowOnChange(bar)
 end
 
+HFGrowbar.defaults = {
+  bgColour = {0, 0, 0, 0.8}; -- background colour
+  fgColour = {1, 1, 1, 1}; -- foreground colour
+  changeTime = 100; -- bar width transition time in ms
+  changeEasing = ZO_EaseOutQuintic; -- bar width transition easing function
+  glowTime = 500; -- diff indicator display time in ms
+  glowEasing = ZO_EaseInQuintic; -- diff indicator easing function
+  glowMaxAlpha = 0.8;  -- max alpha of diff indicator
+  height = 30; 
+  width = 300;
+};
+HFGrowbar.defaults.__index = HFGrowbar.defaults;
+
 -- Available options:
 -- glowTime (ms): amount of time a gain glows. (default is 10000)
 -- bgColour ({r,g,b,a}): background colour (defualt is black)
@@ -83,31 +96,10 @@ end
 -- height: height of bar
 function HFGrowbar:create(parent, opts)
   local bar = setmetatable({}, self)
-
-  if opts == nil then opts = {} end
-
-
-  HFUFDEBUGTEXT:SetText(tostring(ZO_))
-
-  -- defaults
-  if opts.bgColour == nil then opts.bgColour = {0, 0, 0, 0.8} end
-  if opts.fgColour == nil then opts.fgColour = {1, 1, 1, 1} end
-  if opts.changeTime == nil then opts.changeTime = 100 end
-  if opts.easing == nil then opts.changeEasing = ZO_EaseOutQuintic end
-  if opts.glowTime == nil then opts.glowTime = 500 end
-  if opts.glowEasing == nil then opts.glowEasing = ZO_EaseInQuintic end
-  if opts.glowMaxAlpha == nil then opts.glowMaxAlpha = 0.8 end
-  if opts.height == nil then opts.height = 30 end
-  if opts.width == nil then opts.width = 300 end
-
-  -- emitter
+  bar.opts = setmetatable(opts or {}, HFGrowbar.defaults)
   EventEmitter:new(bar)
-
-  bar.opts = opts
   bar.value = 1
-
   render(bar, parent)
-
   return bar
 end
 
