@@ -12,6 +12,8 @@ local render = function(uf, parent)
 
   container:SetDimensions(uf.opts.width, uf.opts.height)
   container:SetColor(0, 0, 0, 0.25)
+  container:SetAlpha(1)
+  container:SetSimpleAnchorParent(0, 0)
 
   uf.container = container
 

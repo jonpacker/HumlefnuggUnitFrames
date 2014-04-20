@@ -1,6 +1,6 @@
 <GuiXml>
   <Controls>
-    <TopLevelControl name="HFUFFrame" mouseEnabled="false">
+    <TopLevelControl name="HFUFFrame" movable="true" mouseEnabled="true" alpha="1">
       <Dimensions x="1000" y="500" />
       <Anchor point="CENTER" />
     </TopLevelControl>

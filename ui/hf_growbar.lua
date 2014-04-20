@@ -39,25 +39,29 @@ local animateGlowOnChange = function(bar)
   end)
 end
 
-local render = function(self, parent)
+local render = function(bar, parent)
   local container = WINDOW_MANAGER:CreateControl(getUniqueName("container"), parent, CT_TEXTURE)
-  local bar = WINDOW_MANAGER:CreateControl(getUniqueName("bar"), container, CT_TEXTURE)
-  local glow = WINDOW_MANAGER:CreateControl(getUniqueName("glow"), bar, CT_TEXTURE)
+  local fillBar = WINDOW_MANAGER:CreateControl(getUniqueName("bar"), container, CT_TEXTURE)
+  local glow = WINDOW_MANAGER:CreateControl(getUniqueName("glow"), fillBar, CT_TEXTURE)
 
-  container:SetDimensions(self.opts.width, self.opts.height)
-  container:SetColor(unpack(self.opts.bgColour))
-  bar:SetDimensions(width, height)
-  bar:SetColor(unpack(self.opts.fgColour))
-  glow:SetDimensions(0, height)
+  container:SetDimensions(bar.opts.width, bar.opts.height)
+  container:SetColor(unpack(bar.opts.bgColour))
+  container:SetSimpleAnchorParent(0, 0)
+
+  fillBar:SetDimensions(bar.opts.width, bar.opts.height)
+  fillBar:SetColor(unpack(bar.opts.fgColour))
+  fillBar:SetSimpleAnchorParent(0, 0)
+
+  glow:SetDimensions(0, bar.opts.height)
   glow:SetColor(1, 1, 1, 1);
-  glow:SetAnchor(TOPRIGHT, bar, TOPRIGHT, 0, 0)
+  glow:SetAnchor(TOPRIGHT, fillBar, TOPRIGHT, 0, 0)
 
-  self.container = container
-  self.bar = bar
-  self.glow = glow
+  bar.container = container
+  bar.bar = fillBar
+  bar.glow = glow
 
-  animateGlowOnChange(self)
-  animateWidthChange(self)
+  animateGlowOnChange(bar)
+  animateWidthChange(bar)
 end
 
 -- Available options:
