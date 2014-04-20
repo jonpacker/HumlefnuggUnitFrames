@@ -9,7 +9,11 @@ function HFGrowbar:create(parent, width, height, colour, opts)
   if opts == nil then opts = {} end
   if opts.glowTime == nil then opts.glowTime = 10000 end
 
-  bar:render()
+  bar:render(parent, width, height, colour)
 
   return bar
+end
+
+function HFGrowbar:render(parent, width, height, colour)
+  
 end
