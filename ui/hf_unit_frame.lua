@@ -21,6 +21,28 @@ local updateIdentity = function(uf, parent)
   if uf.unit.hasStamina then uf.staminaBar:update(uf.unit.stamina / uf.unit.staminaMax, true) end
 end
 
+local renderHealthChangeIndicator = function(uf)
+  local healthChange = WINDOW_MANAGER:CreateControl(getUniqueName("healthchange"), uf.healthBar.container, CT_LABEL)
+  healthChange:SetDimensions(barWidth / 2, uf.healthBar.opts.height)
+  healthChange:SetAnchor(TOPRIGHT, uf.healthBar, TOPRIGHT, -10, 0)
+  healthChange:SetVerticalAlignment(TEXT_ALIGN_CENTER);
+  healthChange:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.nameFont, math.floor(uf.opts.healthHeight / 2.5)))
+  healthChange:SetColor(255/255, 195/255, 0/255, 1);
+
+  local fadeOutTimeline = ANIMATION_MANAGER:CreateTimeline()
+  local fadeOut = fadeOutTimeline:InsertAnimation(ANIMATION_ALPHA, healthChange, 0);
+  fadeOut:SetDuration(500);
+  fadeOut:SetEasingFunction(ZO_EaseInQuintic);
+  fadeOut:SetAlphaValues(1, 0);
+
+  uf.unit:on('health-update', function()
+    fadeOutTimeline:Stop()
+    local sign = uf.unit.healthDiff > 0 and "+" or "-"
+    healthChange:SetText(string.format("%s%d", sign, math.abs(uf.unit.healthDiff)))
+    fadeOutTimeline:PlayFromStart()
+  end)
+end
+
 local render = function(uf, parent)
   local container = WINDOW_MANAGER:CreateControl(getUniqueName("container"), parent, CT_TEXTURE)
 
@@ -72,6 +94,10 @@ local render = function(uf, parent)
   charName:SetColor(1, 1, 1, 1);
   uf.charName = charName;
 
+  if uf.opts.indicateHeathChange then
+    renderHealthChangeIndicator(uf)
+  end
+
   updateIdentity(uf);
 end
 
@@ -103,6 +129,7 @@ local defaults = {
   staminaHeight = 25;
   width = 360;
   padding = 3;
+  indicateHeathChange = false;
   restingBg = { 54/255, 54/255, 54/255, 0.4 };
   combatBg = { 90/255, 54/255, 54/255, 0.9 };
   nameFont = "HumlefnuggUnitFrames/libs/AlegreyaSansSC-ExtraBold.ttf";

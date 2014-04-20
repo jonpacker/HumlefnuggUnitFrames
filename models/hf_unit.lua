@@ -21,24 +21,33 @@ local updateUnit = function(unit)
 
   if unit.hasStamina then
     unit.stamina, unit.staminaMax, unit.staminaEffectiveMax = GetUnitPower(unit.unit, POWERTYPE_STAMINA)
+    unit.outgoingStamina = unit.stamina
   end
 
   if unit.hasMagicka then
     unit.magicka, unit.magickaMax, unit.magickaEffectiveMax = GetUnitPower(unit.unit, POWERTYPE_MAGICKA)
+    unit.outgoingMagicka = unit.magicka
   end
 
 end
 
 local listenForChanges = function(unit, changeEvent)
-  unit:on('magicka-update', function(magicka, magickaMax, magickaEffectiveMax)
-    unit.magicka, unit.magickaMax, unit.magickaEffectiveMax = magicka, magickaMax, magickaEffectiveMax
-  end)
-  unit:on('stamina-update', function(stamina, staminaMax, staminaEffectiveMax)
-    unit.stamina, unit.staminaMax, unit.staminaEffectiveMax = stamina, staminaMax, staminaEffectiveMax
-  end)
-  unit:on('health-update', function(health, healthMax, healthEffectiveMax)
-    unit.health, unit.healthMax, unit.healthEffectiveMax = health, healthMax, healthEffectiveMax
-  end)
+  function updatePower(powerType)
+    return function(power, powerMax, powerEffectiveMax)
+      unit[powerType.."Outgoing"] = unit[powerType]
+      unit[powerType.."MaxOutgoing"] = unit[powerType.."Max"]
+      unit[powerType.."EffectiveMaxOutgoing"] = unit[powerType.."EffectiveMax"] 
+      unit[powerType.."Diff"] = power - unit[powerType]
+      unit[powerType.."MaxDiff"] = powerMax - unit[powerType.."Max"]
+      unit[powerType.."EffectiveMaxDiff"] = powerEffectiveMax - unit[powerType.."EffectiveMax"]
+      unit[powerType], unit[powerType.."Max"], unit[powerType.."EffectiveMax"] = power, powerMax, powerEffectiveMax
+    end
+  end
+
+  unit:on('magicka-update', updatePower('magicka'))
+  unit:on('stamina-update', updatePower('stamina'))
+  unit:on('health-update', updatePower('health'))
+
   unit:on('stats-update', function()
     updateUnit(unit)
   end)

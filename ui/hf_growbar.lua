@@ -35,39 +35,53 @@ local animateWidthChange = function(bar)
 end
 
 local animateGlowOnChange = function(bar)
-  local timeline = ANIMATION_MANAGER:CreateTimeline()
-  timeline:InsertCallback(function()
-    bar.glow:SetAlpha(bar.opts.glowMaxAlpha)
-    bar.glow:SetWidth(0)
-  end, 0)
+  function createGlowTimeline(control)
+    local timeline = ANIMATION_MANAGER:CreateTimeline()
+    timeline:InsertCallback(function()
+      control:SetAlpha(bar.opts.glowMaxAlpha)
+      control:SetWidth(0)
+    end, 0)
 
-  local disappear = timeline:InsertAnimation(ANIMATION_ALPHA, bar.glow, 0)
-  disappear:SetDuration(bar.opts.glowTime)
-  disappear:SetEasingFunction(bar.opts.glowEasing)
-  disappear:SetAlphaValues(bar.opts.glowMaxAlpha, 0)
+    local disappear = timeline:InsertAnimation(ANIMATION_ALPHA, control, 0)
+    disappear:SetDuration(bar.opts.glowTime)
+    disappear:SetEasingFunction(bar.opts.glowEasing)
+    disappear:SetAlphaValues(bar.opts.glowMaxAlpha, 0)
 
-  local expand = timeline:InsertAnimation(ANIMATION_SIZE, bar.glow, 0)
-  expand:SetDuration(bar.opts.changeTime)
-  expand:SetEasingFunction(bar.opts.changeEasing)
-  expand:SetStartAndEndWidth(0, 0)
-  expand:SetStartAndEndHeight(bar.opts.height, bar.opts.height)
+    local expand = timeline:InsertAnimation(ANIMATION_SIZE, control, 0)
+    expand:SetDuration(bar.opts.changeTime)
+    expand:SetEasingFunction(bar.opts.changeEasing)
+    expand:SetStartAndEndWidth(0, 0)
+    expand:SetStartAndEndHeight(bar.opts.height, bar.opts.height)
+
+    return timeline, disappear, expand
+  end
+
+  local gainTimeline, gainDisappear, gainExpand = createGlowTimeline(bar.gain)
+  local loseTimeline, loseDisappear, loseExpand = createGlowTimeline(bar.lose)
 
   bar:on("update", function(value, immediate)
     if value == bar.value or immediate then return end
-    timeline:Stop()
-    local widthDiff = math.abs(value - bar.value) * bar.opts.width
-    if bar.bar:GetWidth() - widthDiff < 0 then
-      widthDiff = bar.bar:GetWidth()
+
+    if gainTimeline:IsPlaying() then gainTimeline:PlayInstantlyToEnd() end
+    if loseTimeline:IsPlaying() then loseTimeline:PlayInstantlyToEnd() end
+
+    local widthDiff = (value - bar.value) * bar.opts.width
+
+    if widthDiff < 0 then
+      loseExpand:SetStartAndEndWidth(0, math.abs(widthDiff))
+      loseTimeline:PlayFromStart()
+    else
+      gainExpand:SetStartAndEndWidth(0, math.abs(widthDiff))
+      gainTimeline:PlayFromStart()
     end
-    expand:SetStartAndEndWidth(0, widthDiff)
-    timeline:PlayFromStart()
   end)
 end
 
 local render = function(bar, parent)
   local container = WINDOW_MANAGER:CreateControl(getUniqueName("container"), parent, CT_TEXTURE)
   local fillBar = WINDOW_MANAGER:CreateControl(getUniqueName("bar"), container, CT_TEXTURE)
-  local glow = WINDOW_MANAGER:CreateControl(getUniqueName("glow"), fillBar, CT_TEXTURE)
+  local gain = WINDOW_MANAGER:CreateControl(getUniqueName("gain"), fillBar, CT_TEXTURE)
+  local lose = WINDOW_MANAGER:CreateControl(getUniqueName("lose"), fillBar, CT_TEXTURE)
 
   container:SetDimensions(bar.opts.width, bar.opts.height)
   container:SetColor(unpack(bar.opts.bgColour))
@@ -77,13 +91,18 @@ local render = function(bar, parent)
   fillBar:SetColor(unpack(bar.opts.fgColour))
   fillBar:SetSimpleAnchorParent(0, 0)
 
-  glow:SetDimensions(0, bar.opts.height)
-  glow:SetColor(1, 1, 1, bar.opts.glowMaxAlpha);
-  glow:SetAnchor(TOPRIGHT, fillBar, TOPRIGHT, 0, 0)
+  gain:SetDimensions(0, bar.opts.height)
+  gain:SetColor(1, 1, 1, bar.opts.glowMaxAlpha);
+  gain:SetAnchor(TOPRIGHT, fillBar, TOPRIGHT, 0, 0)
+
+  lose:SetDimensions(0, bar.opts.height)
+  lose:SetColor(unpack(bar.opts.fgColour));
+  lose:SetAnchor(TOPLEFT, fillBar, TOPRIGHT, 0, 0)
 
   bar.container = container
   bar.bar = fillBar
-  bar.glow = glow
+  bar.gain = gain
+  bar.lose = lose
 
   animateWidthChange(bar)
   animateGlowOnChange(bar)
@@ -92,7 +111,7 @@ end
 local defaults = {
   bgColour = {0, 0, 0, 0.8}; -- background colour
   fgColour = {1, 1, 1, 1}; -- foreground colour
-  changeTime = 100; -- bar width transition time in ms
+  changeTime = 150; -- bar width transition time in ms
   changeEasing = ZO_EaseOutQuintic; -- bar width transition easing function
   glowTime = 500; -- diff indicator display time in ms
   glowEasing = ZO_EaseInQuintic; -- diff indicator easing function
