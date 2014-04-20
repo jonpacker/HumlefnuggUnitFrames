@@ -7,16 +7,22 @@ local getUniqueName = function(hint)
   return "HFGrowbar_control_"..hint.."_"..controlCounter
 end
 
+local fastForwardTimeline = function(tl)
+  if tl:IsPlaying() then tl:PlayInstantlyToEnd() end
+end
+
 local animateWidthChange = function(bar)
   local timeline = ANIMATION_MANAGER:CreateTimeline()
   local anim = timeline:InsertAnimation(ANIMATION_SIZE, bar.bar, 0)
   anim:SetDuration(bar.opts.changeTime)
   anim:SetEasingFunction(ZO_BezierInEase)
+  anim:SetStartAndEndHeight(bar.opts.height, bar.opts.height)
 
-  bar:on("update", function(fill)
-    HFUFDEBUGTEXT:SetText(fill)
-    timeline:Stop()
-    anim:SetStartAndEndWidth(bar.bar:GetWidth(), bar.opts.width * fill)
+  bar:on("update", function(value)
+    if value == bar.value then return end
+    fastForwardTimeline(timeline)
+    timeline:PlayInstantlyToEnd()
+    anim:SetStartAndEndWidth(bar.bar:GetWidth(), bar.opts.width * value)
     timeline:PlayFromStart()
   end)
 end
@@ -32,9 +38,10 @@ local animateGlowOnChange = function(bar)
   disappear:SetDuration(bar.opts.glowTime / 2)
   disappear:SetAlphaValues(1, 0)
 
-  bar:on("update", function(fill)
-    timeline:Stop()
-    local widthDiff = math.abs(fill - bar.fill)
+  bar:on("update", function(value)
+    if value == bar.value then return end
+    fastForwardTimeline(timeline)
+    local widthDiff = math.abs(value - bar.value)
     bar.glow:SetWidth(widthDiff * bar.opts.width)
     timeline:PlayFromStart()
   end)
@@ -79,7 +86,7 @@ function HFGrowbar:create(parent, opts)
   if opts == nil then opts = {} end
 
   -- defaults
-  if opts.glowTime == nil then opts.glowTime = 10000 end
+  if opts.glowTime == nil then opts.glowTime = 1000 end
   if opts.bgColour == nil then opts.bgColour = {0, 0, 0, 0.8} end
   if opts.fgColour == nil then opts.fgColour = {1, 1, 1, 1} end
   if opts.changeTime == nil then opts.changeTime = 100 end
@@ -91,14 +98,14 @@ function HFGrowbar:create(parent, opts)
   EventEmitter:new(bar)
 
   bar.opts = opts
-  bar.fill = 1
+  bar.value = 1
 
   render(bar, parent)
 
   return bar
 end
 
-function HFGrowbar:update(newFillPercent)
-  self:emit("update", newFillPercent)
-  self.fill = newFillPercent;
+function HFGrowbar:update(newValue)
+  self:emit("update", newValue)
+  self.value = newValue;
 end
