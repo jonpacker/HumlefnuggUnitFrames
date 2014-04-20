@@ -7,67 +7,101 @@ local getUniqueName = function(hint)
   return "HFUnitFrame_control_"..hint.."_"..controlCounter
 end
 
+local updateIdentity = function(uf, parent)
+  if not uf.unit.exists then
+    uf.container:SetHidden(true)
+    return
+  end
+
+  uf.container:SetHidden(false)
+  uf.charName:SetText(uf.unit.name)
+  uf.healthBar:update(uf.unit.health / uf.unit.healthMax, true)
+  uf.magickaBar:update(uf.unit.magicka / uf.unit.magickaMax, true)
+  uf.staminaBar:update(uf.unit.stamina / uf.unit.staminaMax, true)
+end
+
 local render = function(uf, parent)
   local container = WINDOW_MANAGER:CreateControl(getUniqueName("container"), parent, CT_TEXTURE)
 
-  container:SetDimensions(uf.opts.width, uf.opts.height)
   container:SetColor(unpack(uf.opts.restingBg))
   container:SetSimpleAnchorParent(0, 0)
 
   uf.container = container
 
+  local containerHeight = uf.opts.padding * 2 + uf.opts.healthHeight
   local barWidth = uf.opts.width - uf.opts.padding * 2
-  local barVerticalSpace = uf.opts.height - uf.opts.padding * 2
 
   uf.healthBar = HFGrowbar:create(container, {
     fgColour = { 227/255, 94/255, 51/255, 1 };
     bgColour = { 30/255, 30/255, 30/255, 1 };
     width = barWidth;
-    height = barVerticalSpace * 0.5 - uf.opts.padding;
+    height = uf.opts.healthHeight
   })
-  uf.magickaBar = HFGrowbar:create(container, {
-    fgColour = { 38/255, 94/255, 176/255, 1 };
-    bgColour = { 30/255, 30/255, 30/255, 1 };
-    width = barWidth;
-    height = barVerticalSpace * 0.25 - uf.opts.padding;
-  })
-  uf.staminaBar = HFGrowbar:create(container, {
-    fgColour = { 84/255, 189/255, 2/255, 1 };
-    bgColour = { 30/255, 30/255, 30/255, 1 };
-    width = barWidth;
-    height = barVerticalSpace * 0.25 - uf.opts.padding;
-  })
-
+  containerHeight = containerHeight + uf.opts.healthHeight
   uf.healthBar.container:SetAnchor(TOPLEFT, uf.container, TOPLEFT, uf.opts.padding, uf.opts.padding)
-  uf.magickaBar.container:SetAnchor(TOPLEFT, uf.healthBar.container, BOTTOMLEFT, 0, uf.opts.padding)
-  uf.staminaBar.container:SetAnchor(TOPLEFT, uf.magickaBar.container, BOTTOMLEFT, 0, uf.opts.padding)
+
+  if uf.unit.hasMagicka then
+    uf.magickaBar = HFGrowbar:create(container, {
+      fgColour = { 38/255, 94/255, 176/255, 1 };
+      bgColour = { 30/255, 30/255, 30/255, 1 };
+      width = barWidth;
+      height = uf.opts.magickaHeight;
+    })
+    containerHeight = containerHeight + uf.opts.magickaHeight + uf.opts.padding
+    uf.magickaBar.container:SetAnchor(TOPLEFT, uf.healthBar.container, BOTTOMLEFT, 0, uf.opts.padding)
+  end
+
+  if uf.unit.hasStamina then
+    uf.staminaBar = HFGrowbar:create(container, {
+      fgColour = { 84/255, 189/255, 2/255, 1 };
+      bgColour = { 30/255, 30/255, 30/255, 1 };
+      width = barWidth;
+      height = uf.opts.staminaHeight
+    })
+    containerHeight = containerHeight + uf.opts.staminaHeight + uf.opts.padding
+    -- assumes that the magicka bar exists, but i'm not sure there's any units that will have stamina without magicka.
+    uf.staminaBar.container:SetAnchor(TOPLEFT, uf.magickaBar.container, BOTTOMLEFT, 0, uf.opts.padding)
+  end
+
+  container:SetDimensions(uf.opts.width, containerHeight)
 
   local charName = WINDOW_MANAGER:CreateControl(getUniqueName("charname"), uf.healthBar.container, CT_LABEL)
   charName:SetDimensions(barWidth / 2, uf.healthBar.opts.height)
   charName:SetSimpleAnchorParent(10, 0);
   charName:SetVerticalAlignment(TEXT_ALIGN_CENTER);
-  charName:SetText(GetUnitName(uf.unit):upper());
   charName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.nameFont, math.floor(uf.opts.height / 4)))
   charName:SetColor(1, 1, 1, 1);
   uf.charName = charName;
+
+  updateIdentity(uf);
 end
 
 local listen = function(uf)
-  uf:on('health-update', function(current, total)
+  uf.unit:on('health-update', function(current, total)
     uf.healthBar:update(current / total);
   end)
 
-  uf:on('magicka-update', function(current, total)
+  uf.unit:on('magicka-update', function(current, total)
     uf.magickaBar:update(current / total);
   end)
 
-  uf:on('stamina-update', function(current, total)
+  uf.unit:on('stamina-update', function(current, total)
     uf.staminaBar:update(current / total);
+  end)
+
+  uf.unit:on('stats-update', function() 
+    updateIdentity(uf)
+  end)
+
+  uf.unit:on('change-identity', function()
+    updateIdentity(uf)
   end)
 end
 
 local defaults = {
-  height = 80;
+  healthHeight: 40,
+  magickaHeight: 25,
+  staminaHeight: 25,
   width = 360;
   padding = 2;
   restingBg = { 54/255, 54/255, 54/255, 0.8 };
@@ -86,8 +120,6 @@ function HFUnitFrame:create(parent, unit, opts)
   render(unitFrame, parent)
   listen(unitFrame)
 
-  HFUnitEventSource(unit):pipe(unitFrame)
-
   return unitFrame
 end
 
@@ -99,4 +131,9 @@ function HFUnitFrame:setCombatState(combat)
     self.charName:SetAlpha(1)
     self.container:SetColor(unpack(self.opts.restingBg))
   end
+end
+
+function HFUnitFrame:reloadTarget()
+  uf.charName:SetText(GetUnitName(self.unit):upper())
+
 end

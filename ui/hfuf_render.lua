@@ -5,20 +5,8 @@ local observeCombat = function()
   end)
 end
 
-local observeTarget = function()
-  HFEventDelegate:on("target-change", function()
-    local targetName = GetUnitName('reticleover')
-    if targetName == "" then
-      HFUF.targetFrame.container:SetHidden(true)
-    else
-      HFUF.targetFrame.container:SetHidden(false)
-      HFUF.targetFrame:reloadTarget()
-  end)
-end
-
 function HFUF:create(parent)
-	self.playerFrame = HFUnitFrame:create(parent, 'player')
-  self.targetFrame = HFUnitFrame:create(parent, 'reticleover')
+	self.playerFrame = HFUnitFrame:create(parent, HFUnitModel:get('player'))
+  self.targetFrame = HFUnitFrame:create(parent, HFUnitModel:get('reticleover'))
   observeCombat()
-  observeTarget()
 end

@@ -45,6 +45,7 @@ local listenForChanges = function(unit, changeEvent)
 
   if changeEvent then
     HFEventDelegate:on(changeEvent, function() 
+      unit:emit('change-identity')
       updateUnit(unit)
     end)
   end
