@@ -11,8 +11,8 @@ local render = function(uf, parent)
   local container = WINDOW_MANAGER:CreateControl(getUniqueName("container"), parent, CT_TEXTURE)
 
   container:SetDimensions(uf.opts.width, uf.opts.height)
-  container:SetColor(0, 0, 0, 0.25)
-  container:SetAlpha(1)
+  container:SetColor(54/255, 54/255, 54/255, 1)
+  container:SetAlpha(0.8)
   container:SetSimpleAnchorParent(0, 0)
 
   uf.container = container
@@ -54,19 +54,17 @@ local listen = function(uf)
   end)
 end
 
+local defaults = {
+  height = 80;
+  width = 360;
+};
+defaults.__index = defaults;
+
 function HFUnitFrame:create(parent, opts)
   local unitFrame = setmetatable({}, self)
 
-  if opts == nil then opts = {} end
-
-  -- defaults
-  if opts.height == nil then opts.height = 100 end
-  if opts.width == nil then opts.width = 300 end
-
-  -- emitter
+  unitFrame.opts = setmetatable(opts or {}, defaults)
   EventEmitter:new(unitFrame)
-
-  unitFrame.opts = opts
 
   render(unitFrame, parent)
   listen(unitFrame)

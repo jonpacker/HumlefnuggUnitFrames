@@ -73,7 +73,7 @@ local render = function(bar, parent)
   animateGlowOnChange(bar)
 end
 
-HFGrowbar.defaults = {
+local defaults = {
   bgColour = {0, 0, 0, 0.8}; -- background colour
   fgColour = {1, 1, 1, 1}; -- foreground colour
   changeTime = 100; -- bar width transition time in ms
@@ -84,7 +84,7 @@ HFGrowbar.defaults = {
   height = 30; 
   width = 300;
 };
-HFGrowbar.defaults.__index = HFGrowbar.defaults;
+defaults.__index = defaults;
 
 -- Available options:
 -- glowTime (ms): amount of time a gain glows. (default is 10000)
@@ -96,7 +96,7 @@ HFGrowbar.defaults.__index = HFGrowbar.defaults;
 -- height: height of bar
 function HFGrowbar:create(parent, opts)
   local bar = setmetatable({}, self)
-  bar.opts = setmetatable(opts or {}, HFGrowbar.defaults)
+  bar.opts = setmetatable(opts or {}, defaults)
   EventEmitter:new(bar)
   bar.value = 1
   render(bar, parent)
