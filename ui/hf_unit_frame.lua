@@ -23,11 +23,12 @@ end
 
 local renderHealthChangeIndicator = function(uf)
   local healthChange = WINDOW_MANAGER:CreateControl(getUniqueName("healthchange"), uf.healthBar.container, CT_LABEL)
-  healthChange:SetDimensions(barWidth / 2, uf.healthBar.opts.height)
-  healthChange:SetAnchor(TOPRIGHT, uf.healthBar, TOPRIGHT, -10, 0)
+  healthChange:SetDimensions(uf.healthBar.container:GetWidth() / 2, uf.healthBar.opts.height)
+  healthChange:SetAnchor(TOPRIGHT, uf.healthBar.container, TOPRIGHT, -10, 0)
   healthChange:SetVerticalAlignment(TEXT_ALIGN_CENTER);
-  healthChange:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.nameFont, math.floor(uf.opts.healthHeight / 2.5)))
-  healthChange:SetColor(255/255, 195/255, 0/255, 1);
+  healthChange:SetHorizontalAlignment(TEXT_ALIGN_RIGHT);
+  healthChange:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.nameFont, math.floor(uf.opts.healthHeight / 2)))
+  healthChange:SetColor(255/255, 222/255, 78/255, 1);
 
   local fadeOutTimeline = ANIMATION_MANAGER:CreateTimeline()
   local fadeOut = fadeOutTimeline:InsertAnimation(ANIMATION_ALPHA, healthChange, 0);
@@ -36,6 +37,7 @@ local renderHealthChangeIndicator = function(uf)
   fadeOut:SetAlphaValues(1, 0);
 
   uf.unit:on('health-update', function()
+    if uf.unit.healthDiff == 0 then return end
     fadeOutTimeline:Stop()
     local sign = uf.unit.healthDiff > 0 and "+" or "-"
     healthChange:SetText(string.format("%s%d", sign, math.abs(uf.unit.healthDiff)))
@@ -94,7 +96,7 @@ local render = function(uf, parent)
   charName:SetColor(1, 1, 1, 1);
   uf.charName = charName;
 
-  if uf.opts.indicateHeathChange then
+  if uf.opts.indicateHealthChange then
     renderHealthChangeIndicator(uf)
   end
 
@@ -129,7 +131,7 @@ local defaults = {
   staminaHeight = 25;
   width = 360;
   padding = 3;
-  indicateHeathChange = false;
+  indicateHealthChange = false;
   restingBg = { 54/255, 54/255, 54/255, 0.4 };
   combatBg = { 90/255, 54/255, 54/255, 0.9 };
   nameFont = "HumlefnuggUnitFrames/libs/AlegreyaSansSC-ExtraBold.ttf";
