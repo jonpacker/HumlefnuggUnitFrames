@@ -13,7 +13,9 @@ end
 -- fgColour ({r,g,b,a}): foreground colour (default is white)
 -- changeTime (ms): amount of time bar takes to change (animation)  (default is 100)
 -- easing (fn): easing function (default is ZO_BezierInEase)
-function HFGrowbar:create(parent, width, height, opts)
+-- width: width of bar
+-- height: height of bar
+function HFGrowbar:create(parent, opts)
   local bar = setmetatable({}, self)
 
   if opts == nil then opts = {} end
@@ -23,16 +25,24 @@ function HFGrowbar:create(parent, width, height, opts)
   if opts.bgColour == nil then opts.bgColour = {0, 0, 0, 0.8} end
   if opts.fgColour == nil then opts.fgColour = {1, 1, 1, 1} end
   if opts.changeTime == nil then opts.changeTime = 100 end
-  if opts.easing == nil then opts.easing == ZO_BezierInEase end
+  if opts.easing == nil then opts.easing = ZO_BezierInEase end
+  if opts.height == nil then opts.height = 30 end
+  if opts.width == nil then opts.width = 300 end
 
   -- emitter
   EventEmitter:new(bar)
 
   bar.opts = opts
+  bar.fill = 1
 
   render(bar, parent, width, height)
 
   return bar
+end
+
+function HFGrowbar:update(newFillPercent)
+  self:emit("update", newFillPercent)
+  self.fill = newFillPercent;
 end
 
 local render = function(self, parent, width, height)
@@ -40,7 +50,7 @@ local render = function(self, parent, width, height)
   local bar = WINDOW_MANAGER:CreateControl(getUniqueName("bar"), container, CT_TEXTURE)
   local glow = WINDOW_MANAGER:CreateControl(getUniqueName("glow"), bar, CT_TEXTURE)
 
-  container:SetDimensions(width, height)
+  container:SetDimensions(self.opts.width, self.opts.height)
   container:SetColor(unpack(self.opts.bgColour))
   bar:SetDimensions(width, height)
   bar:SetColor(unpack(self.opts.fgColour))
@@ -62,9 +72,9 @@ local animateWidthChange = function(bar)
   anim:SetDuration(bar.opts.changeTime)
   anim:SetEasingFunction(ZO_BezierInEase)
 
-  bar:on("updateWidth", function(width)
+  bar:on("update", function(fill)
     timeline:Stop()
-    anim:SetStartAndEndWidth(bar.bar:GetWidth(), width)
+    anim:SetStartAndEndWidth(bar.bar:GetWidth(), bar.opts.width * fill)
     timeline:PlayFromStart()
   end)
 end
@@ -80,10 +90,10 @@ local animateGlowOnChange = function(bar)
   disappear:SetDuration(bar.opts.glowTime / 2)
   disappear:SetAlphaValues(1, 0)
 
-  bar:on("updateWidth", function(width)
+  bar:on("update", function(fill)
     timeline:Stop()
-    local widthDiff = math.abs(width - bar.bar:GetWidth())
-    bar.glow:SetWidth(widthDiff)
+    local widthDiff = math.abs(fill - bar.fill)
+    bar.glow:SetWidth(widthDiff * bar.opts.width)
     timeline:PlayFromStart()
   end)
 end
