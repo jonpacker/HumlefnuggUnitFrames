@@ -2,34 +2,39 @@ EventEmitter = {}
 
 function EventEmitter:new(object)
   object = object or {}
-  object._listeners = {}
-  object._pipes = {}
+  local _listeners = {}
+  local _pipes = {}
 
   function object:on(event, callback)
-    local listeners = self._listeners[event] or {}
+    local listeners = _listeners[event] or {}
     listeners[#listeners + 1] = callback
-    self._listeners[event] = listeners
+    _listeners[event] = listeners
   end
 
   function object:emit(event, ...)
-    local listeners = self._listeners[event]
-    if not listeners then return end
-    for _, listener in pairs(listeners) do
-      if "function" == type(listener) then
-        listener(...)
+    local listeners = _listeners[event]
+
+    if listeners ~= nil then
+      for _, listener in pairs(listeners) do
+        if "function" == type(listener) then
+          listener(...)
+        end
       end
     end
-    for _, pipe in pairs(self._pipes) do
-      pipe:emit(event, ...)
+
+    if #_pipes > 0 then
+      for _, pipe in pairs(_pipes) do
+        pipe:emit(event, ...)
+      end
     end
   end
 
   function object:pipe(to)
-    self._pipes[#self._pipes + 1] = to
-    return #self._pipes
+    _pipes[#_pipes + 1] = to
+    return #_pipes
   end
 
-  function EventEmitter:on(event, callback)
+  function object:once(event, callback)
     local function once_handler(...)
       self:remove_listener(event, once_handler)
       callback(...)
@@ -38,8 +43,8 @@ function EventEmitter:new(object)
     self:on(event, once_handler)
   end
 
-  function EventEmitter:remove_listener(event, callback)
-    local listeners = self._listeners[event]
+  function object:remove_listener(event, callback)
+    local listeners = _listeners[event]
     if not listeners then return false end
     
     for index, listener in pairs(listeners) do

@@ -14,6 +14,7 @@ local animateWidthChange = function(bar)
   anim:SetEasingFunction(ZO_BezierInEase)
 
   bar:on("update", function(fill)
+    HFUFDEBUGTEXT:SetText(fill)
     timeline:Stop()
     anim:SetStartAndEndWidth(bar.bar:GetWidth(), bar.opts.width * fill)
     timeline:PlayFromStart()

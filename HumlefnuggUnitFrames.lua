@@ -13,6 +13,8 @@ function HFUF.init(eventCode, addOnName)
   panel = LAM:CreateControlPanel("HFUFConfig", "Humlefnugg Unit Frames")
 
   HFUF.render(HFUFFrame)
+
+  HFUFDEBUGTEXT:SetText("loaded")
 end
 
 

@@ -17,19 +17,21 @@ function HFUnitEventSource(unit)
 
   delegate:on("power-update", function(eventCode, eventUnit, powerIndex, powerType, powerValue, powerMax, powerEffectiveMax)
     if unit ~= eventUnit then return end
-  
+
     local eventName = nil
     if powerType == POWERTYPE_HEALTH then
       eventName = "health-update"
-    elseif powerType == POWERTYPE_HEALTH then
+    elseif powerType == POWERTYPE_MAGICKA then
       eventName = "magicka-update"
     elseif powerType == POWERTYPE_STAMINA then
       eventName = "stamina-update"
     end
-    
+
     if eventName ~= nil then
       es:emit(eventName, powerValue, powerMax, powerEffectiveMax)
     end
   end)
+
+  return es
 end
 
