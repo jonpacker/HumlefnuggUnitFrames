@@ -18,23 +18,26 @@ local render = function(uf, parent)
   uf.container = container
 
   uf.healthBar = HFGrowbar:create(container, {
-    fgColour = { 255, 0, 0, 1 };
+    fgColour = { 255/255, 46/255, 0, 1 };
+    bgColour = { 54/255, 54/255, 54/255, 1 };
     width = uf.opts.width;
     height = uf.opts.height / 3;
   })
   uf.magickaBar = HFGrowbar:create(container, {
-    fgColour = { 0, 0, 255, 1 };
+    fgColour = { 38/255, 94/255, 176/255, 1 };
+    bgColour = { 54/255, 54/255, 54/255, 1 };
     width = uf.opts.width;
     height = uf.opts.height / 3;
   })
   uf.staminaBar = HFGrowbar:create(container, {
-    fgColour = { 0, 255, 0, 1 };
+    fgColour = { 84/255, 189/255, 2/255, 1 };
+    bgColour = { 54/255, 54/255, 54/255, 1 };
     width = uf.opts.width;
     height = uf.opts.height / 3;
   })
 
-  uf.magickaBar.container:SetSimpleAnchorParent(0, uf.opts.height / 3)
-  uf.staminaBar.container:SetSimpleAnchorParent(0, uf.opts.height / 3 * 2)
+  uf.magickaBar.container:SetAnchor(TOPLEFT, uf.healthBar.container, BOTTOMLEFT, 0, 0)
+  uf.staminaBar.container:SetAnchor(TOPLEFT, uf.magickaBar.container, BOTTOMLEFT, 0, 0)
 end
 
 local listen = function(uf)
