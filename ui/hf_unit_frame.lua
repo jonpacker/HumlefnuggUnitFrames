@@ -61,7 +61,7 @@ function HFUnitFrame:create(parent, opts)
   if opts.width == nil then opts.width = 300 end
 
   -- emitter
-  EventEmitter.init(bar)
+  EventEmitter:new(bar)
 
   unitFrame.opts = opts
 
