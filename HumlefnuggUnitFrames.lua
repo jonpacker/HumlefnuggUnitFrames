@@ -16,4 +16,4 @@ function HFUF.init(eventCode, addOnName)
 end
 
 
-EVENT_MANAGER:RegisterForEvent("HFUF", EVENT_ADD_ON_LOADED, HFXB.init)
+EVENT_MANAGER:RegisterForEvent("HFUF", EVENT_ADD_ON_LOADED, HFUF.init)
