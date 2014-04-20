@@ -102,9 +102,9 @@ local defaults = {
   magickaHeight = 25;
   staminaHeight = 25;
   width = 360;
-  padding = 2;
-  restingBg = { 54/255, 54/255, 54/255, 0.8 };
-  combatBg = { 54/255, 54/255, 54/255, 0.8 };
+  padding = 3;
+  restingBg = { 54/255, 54/255, 54/255, 0.4 };
+  combatBg = { 90/255, 54/255, 54/255, 0.9 };
   nameFont = "HumlefnuggUnitFrames/libs/AlegreyaSansSC-ExtraBold.ttf";
 };
 defaults.__index = defaults;
