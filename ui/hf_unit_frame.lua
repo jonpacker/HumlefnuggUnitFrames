@@ -42,6 +42,14 @@ local render = function(uf, parent)
   uf.healthBar.container:SetAnchor(TOPLEFT, uf.container, TOPLEFT, uf.opts.padding, uf.opts.padding)
   uf.magickaBar.container:SetAnchor(TOPLEFT, uf.healthBar.container, BOTTOMLEFT, 0, uf.opts.padding)
   uf.staminaBar.container:SetAnchor(TOPLEFT, uf.magickaBar.container, BOTTOMLEFT, 0, uf.opts.padding)
+
+  local charName = WINDOW_MANAGER:CreateControl(getUniqueName("charname"), uf.healthBar.container, CT_LABEL)
+  charName:SetDimensions(barWidth / 2, uf.healthBar.opts.height)
+  charName:SetSimpleAnchorParent(10, 0);
+  charName:SetVerticalAlignment(TEXT_ALIGN_CENTER);
+  charName:SetText(GetUnitName(uf.unit):upper());
+  charName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.nameFont, math.floor(uf.opts.height / 4)))
+  charName:SetColor(1, 1, 1, 1);
 end
 
 local listen = function(uf)
@@ -62,21 +70,21 @@ local defaults = {
   height = 80;
   width = 360;
   padding = 2;
+  nameFont = "HumlefnuggUnitFrames/libs/AlegreyaSansSC-ExtraBold.ttf";
 };
 defaults.__index = defaults;
 
-function HFUnitFrame:create(parent, opts)
+function HFUnitFrame:create(parent, unit, opts)
   local unitFrame = setmetatable({}, self)
 
   unitFrame.opts = setmetatable(opts or {}, defaults)
   EventEmitter:new(unitFrame)
+  unitFrame.unit = unit;
 
   render(unitFrame, parent)
   listen(unitFrame)
 
-  return unitFrame
-end
+  HFUnitEventSource(unit):pipe(unitFrame)
 
-function HFUnitFrame:addEventSource(es)
-  es:pipe(self)
+  return unitFrame
 end
