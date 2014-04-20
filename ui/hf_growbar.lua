@@ -19,10 +19,16 @@ local animateWidthChange = function(bar)
   anim:SetStartAndEndWidth(bar.opts.width, bar.opts.width)
   anim:SetStartAndEndHeight(bar.opts.height, bar.opts.height)
 
-  bar:on("update", function(value)
+  bar:on("update", function(value, immediate)
     if value == bar.value then return end
+
     if timeline:IsPlaying() then timeline:PlayInstantlyToEnd() end
-    timeline:PlayInstantlyToEnd()
+    
+    if immediate then
+      bar.bar:SetWidth(bar.opts.width * value)
+      return
+    end
+
     anim:SetStartAndEndWidth(bar.bar:GetWidth(), bar.opts.width * value)
     timeline:PlayFromStart()
   end)
@@ -46,8 +52,8 @@ local animateGlowOnChange = function(bar)
   expand:SetStartAndEndWidth(0, 0)
   expand:SetStartAndEndHeight(bar.opts.height, bar.opts.height)
 
-  bar:on("update", function(value)
-    if value == bar.value then return end
+  bar:on("update", function(value, immediate)
+    if value == bar.value or immediate then return end
     timeline:Stop()
     widthDiff = value - bar.value
     expand:SetStartAndEndWidth(0, math.abs(widthDiff) * bar.opts.width)
@@ -110,7 +116,7 @@ function HFGrowbar:create(parent, opts)
   return bar
 end
 
-function HFGrowbar:update(newValue)
-  self:emit("update", newValue)
+function HFGrowbar:update(newValue, immediate)
+  self:emit("update", newValue, immediate)
   self.value = newValue;
 end
