@@ -11,8 +11,7 @@ local render = function(uf, parent)
   local container = WINDOW_MANAGER:CreateControl(getUniqueName("container"), parent, CT_TEXTURE)
 
   container:SetDimensions(uf.opts.width, uf.opts.height)
-  container:SetColor(54/255, 54/255, 54/255, 1)
-  container:SetAlpha(0.8)
+  container:SetColor(unpack(uf.opts.restingBg))
   container:SetSimpleAnchorParent(0, 0)
 
   uf.container = container
@@ -50,6 +49,7 @@ local render = function(uf, parent)
   charName:SetText(GetUnitName(uf.unit):upper());
   charName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.nameFont, math.floor(uf.opts.height / 4)))
   charName:SetColor(1, 1, 1, 1);
+  uf.charName = charName;
 end
 
 local listen = function(uf)
@@ -70,6 +70,8 @@ local defaults = {
   height = 80;
   width = 360;
   padding = 2;
+  restingBg = { 54/255, 54/255, 54/255, 0.8 };
+  combatBg = { 54/255, 54/255, 54/255, 0.8 };
   nameFont = "HumlefnuggUnitFrames/libs/AlegreyaSansSC-ExtraBold.ttf";
 };
 defaults.__index = defaults;
@@ -87,4 +89,14 @@ function HFUnitFrame:create(parent, unit, opts)
   HFUnitEventSource(unit):pipe(unitFrame)
 
   return unitFrame
+end
+
+function HFUnitFrame:setCombatState(combat)
+  if combat then
+    self.charName:SetAlpha(0.1)
+    self.container:SetColor(unpack(self.opts.combatBg))
+  else
+    self.charName:SetAlpha(1)
+    self.container:SetColor(unpack(self.opts.restingBg))
+  end
 end

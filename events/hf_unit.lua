@@ -1,11 +1,4 @@
-local delegate = EventEmitter:new()
-local delegateGlobalEventTo = function(globalEvent, localEvent)
-  EVENT_MANAGER:RegisterForEvent("HFUF", globalEvent, function(...)
-    delegate:emit(localEvent, ...)
-  end)
-end
-
-delegateGlobalEventTo(EVENT_POWER_UPDATE, "power-update")
+HFEventDelegate:add(EVENT_POWER_UPDATE, "power-update")
 
 local eventSources = {}
 
@@ -15,7 +8,7 @@ function HFUnitEventSource(unit)
   eventSources[unit] = EventEmitter:new()
   local es = eventSources[unit]
 
-  delegate:on("power-update", function(eventCode, eventUnit, powerIndex, powerType, powerValue, powerMax, powerEffectiveMax)
+  HFEventDelegate:on("power-update", function(eventCode, eventUnit, powerIndex, powerType, powerValue, powerMax, powerEffectiveMax)
     if unit ~= eventUnit then return end
 
     local eventName = nil

@@ -1,0 +1,1 @@
+HFEventDelegate:add(EVENT_PLAYER_COMBAT_STATE, "combat-state")

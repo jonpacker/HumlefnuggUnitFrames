@@ -80,7 +80,7 @@ local defaults = {
   changeEasing = ZO_EaseOutQuintic; -- bar width transition easing function
   glowTime = 500; -- diff indicator display time in ms
   glowEasing = ZO_EaseInQuintic; -- diff indicator easing function
-  glowMaxAlpha = 0.8;  -- max alpha of diff indicator
+  glowMaxAlpha = 0.6;  -- max alpha of diff indicator
   height = 30; 
   width = 300;
 };
