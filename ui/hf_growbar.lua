@@ -23,7 +23,7 @@ local animateWidthChange = function(bar)
     if value == bar.value then return end
 
     if timeline:IsPlaying() then timeline:PlayInstantlyToEnd() end
-    
+
     if immediate then
       bar.bar:SetWidth(bar.opts.width * value)
       return
@@ -55,8 +55,11 @@ local animateGlowOnChange = function(bar)
   bar:on("update", function(value, immediate)
     if value == bar.value or immediate then return end
     timeline:Stop()
-    widthDiff = value - bar.value
-    expand:SetStartAndEndWidth(0, math.abs(widthDiff) * bar.opts.width)
+    local widthDiff = math.abs(value - bar.value) * bar.opts.width
+    if bar.bar:GetWidth() - widthDiff < 0 then
+      widthDiff = bar.bar:GetWidth()
+    end
+    expand:SetStartAndEndWidth(0, )
     timeline:PlayFromStart()
   end)
 end
