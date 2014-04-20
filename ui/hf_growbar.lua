@@ -35,7 +35,7 @@ function HFGrowbar:create(parent, opts)
   bar.opts = opts
   bar.fill = 1
 
-  render(bar, parent, width, height)
+  render(bar, parent)
 
   return bar
 end
@@ -45,7 +45,7 @@ function HFGrowbar:update(newFillPercent)
   self.fill = newFillPercent;
 end
 
-local render = function(self, parent, width, height)
+local render = function(self, parent)
   local container = WINDOW_MANAGER:CreateControl(getUniqueName("container"), parent, CT_TEXTURE)
   local bar = WINDOW_MANAGER:CreateControl(getUniqueName("bar"), container, CT_TEXTURE)
   local glow = WINDOW_MANAGER:CreateControl(getUniqueName("glow"), bar, CT_TEXTURE)

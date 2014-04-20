@@ -10,3 +10,4 @@ HumlefnuggUnitFrames.lua
 HumlefnuggUnitFrames.xml
 
 ui/draw_frames.lua
+ui/hf_growbar.lua
