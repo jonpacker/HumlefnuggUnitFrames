@@ -1,13 +1,10 @@
 ## Title: HumlefnuggUnitFrames
 ## APIVersion: 100003
-## OptionalDependsOn: LibAddonMenu-1.0, LibStub
 ## SavedVariables: HFUFSettings
 
 HumlefnuggUnitFrames.lua
 HumlefnuggUnitFrames.xml
 
-libs/LibStub/LibStub.lua
-libs/LibAddonMenu-1.0/LibAddonMenu-1.0.lua
 libs/emitter.lua
 
 ui/hfuf_render.lua

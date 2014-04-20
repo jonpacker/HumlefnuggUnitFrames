@@ -3,6 +3,11 @@
     <TopLevelControl name="HFUFFrame" alpha="1">
       <Dimensions x="1100" y="200" />
       <Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER" offsetX="0" offsetY="350"/>
+      <Controls>
+        <Label name="HFUFDEBUGTEXT"  inherits="ZO_WindowTitle" color="FFFFFF" wrapMode="ELLIPSIS" verticalAlignment="CENTER" horizontalAlignment="CENTER">
+          <Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER" offsetX="0" offsetY="0"/>
+        </Label>
+      </Controls>
     </TopLevelControl>
   </Controls>
 </GuiXml>
