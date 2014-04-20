@@ -1,10 +1,6 @@
 HFGrowbar = {}
 HFGrowbar.__index = HFGrowbar
 
-local EASE_OUT_EXPO = function (t, b, c, d)
-  return c * ( -math.pow( 2, -10 * t/d ) + 1 ) + b;
-end
-
 local controlCounter = 0;
 local getUniqueName = function(hint)
   controlCounter = controlCounter + 1
@@ -19,7 +15,8 @@ local animateWidthChange = function(bar)
   local timeline = ANIMATION_MANAGER:CreateTimeline()
   local anim = timeline:InsertAnimation(ANIMATION_SIZE, bar.bar, 0)
   anim:SetDuration(bar.opts.changeTime)
-  anim:SetEasingFunction(ZO_BezierInEase)
+  anim:SetEasingFunction(bar.opts.changeEasing)
+  anim:SetStartAndEndWidth(bar.opts.width, bar.opts.width)
   anim:SetStartAndEndHeight(bar.opts.height, bar.opts.height)
 
   bar:on("update", function(value)
@@ -33,13 +30,13 @@ end
 
 local animateGlowOnChange = function(bar)
   local timeline = ANIMATION_MANAGER:CreateTimeline()
+  timeline:InsertCallback(function()
+    bar.glow:SetAlpha(1)
+  end, 0)
 
-  local appear = timeline:InsertAnimation(ANIMATION_ALPHA, bar.glow, 0)
-  appear:SetDuration(1)
-  appear:SetAlphaValues(0, 1)
-
-  local disappear = timeline:InsertAnimation(ANIMATION_ALPHA, bar.glow, bar.opts.glowTime / 2)
+  local disappear = timeline:InsertAnimation(ANIMATION_ALPHA, bar.glow, bar.opts.glowTime)
   disappear:SetDuration(bar.opts.glowTime / 2)
+  disappear:SetEasingFunction(bar.opts.glowEasing)
   disappear:SetAlphaValues(1, 0)
 
   bar:on("update", function(value)
@@ -89,12 +86,16 @@ function HFGrowbar:create(parent, opts)
 
   if opts == nil then opts = {} end
 
+
+  HFUFDEBUGTEXT:SetText(tostring(ZO_))
+
   -- defaults
-  if opts.glowTime == nil then opts.glowTime = 1000 end
   if opts.bgColour == nil then opts.bgColour = {0, 0, 0, 0.8} end
   if opts.fgColour == nil then opts.fgColour = {1, 1, 1, 1} end
   if opts.changeTime == nil then opts.changeTime = 100 end
-  if opts.easing == nil then opts.easing = EASE_OUT_EXPO end
+  if opts.easing == nil then opts.changeEasing = ZO_EaseOutQuintic end
+  if opts.glowTime == nil then opts.glowTime = 500 end
+  if opts.glowEasing == nil then opts.glowEasing = ZO_EaseInQuintic end
   if opts.height == nil then opts.height = 30 end
   if opts.width == nil then opts.width = 300 end
 
