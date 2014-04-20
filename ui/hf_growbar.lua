@@ -49,7 +49,7 @@ local render = function(self, parent)
   bar:SetDimensions(width, height)
   bar:SetColor(unpack(self.opts.fgColour))
   glow:SetDimensions(0, height)
-  glow:SetColor({1, 1, 1, 1});
+  glow:SetColor(1, 1, 1, 1);
   glow:SetAnchor(TOPRIGHT, bar, TOPRIGHT, 0, 0)
 
   self.container = container
