@@ -11,6 +11,8 @@ function HFUF.init(eventCode, addOnName)
 
   -- config menu
   panel = LAM:CreateControlPanel("HFUFConfig", "Humlefnugg Unit Frames")
+
+  HFUF.render(HFUFFrame)
 end
 
 
