@@ -1,4 +1,5 @@
 HFEventDelegate:add(EVENT_POWER_UPDATE, "power-update")
+HFEventDelegate:add(EVENT_STATS_UPDATED, "stats-update")
 
 local eventSources = {}
 
@@ -23,6 +24,10 @@ function HFUnitEventSource(unit)
     if eventName ~= nil then
       es:emit(eventName, powerValue, powerMax, powerEffectiveMax)
     end
+  end)
+
+  HFEventDelegate:on("stats-update", function()
+    es:emit("stats-update");
   end)
 
   return es
