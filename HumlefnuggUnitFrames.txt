@@ -3,8 +3,10 @@
 ## OptionalDependsOn: LibAddonMenu-1.0, LibStub
 ## SavedVariables: HFUFSettings
 
-Libs/LibStub/LibStub.lua
-Libs/LibAddonMenu-1.0/LibAddonMenu-1.0.lua
+libs/LibStub/LibStub.lua
+libs/LibAddonMenu-1.0/LibAddonMenu-1.0.lua
 
 HumlefnuggUnitFrames.lua
 HumlefnuggUnitFrames.xml
+
+ui/draw_frames.lua
