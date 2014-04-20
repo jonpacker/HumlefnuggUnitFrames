@@ -5,9 +5,11 @@
 
 libs/LibStub/LibStub.lua
 libs/LibAddonMenu-1.0/LibAddonMenu-1.0.lua
+libs/emitter.lua
 
 HumlefnuggUnitFrames.lua
 HumlefnuggUnitFrames.xml
 
-ui/draw_frames.lua
+ui/hfuf_render.lua
 ui/hf_growbar.lua
+ui/hf_unit_frame.lua
