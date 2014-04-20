@@ -37,6 +37,20 @@ local render = function(uf, parent)
   uf.staminaBar.container:SetSimpleAnchorParent(0, uf.opts.height / 3 * 2)
 end
 
+local listen = function(uf)
+  uf:on('health-update', function(current, total)
+    uf.healthBar:update(current / total);
+  end)
+
+  uf:on('magicka-update', function(current, total)
+    uf.magickaBar:update(current / total);
+  end)
+
+  uf:on('stamina-update', function(current, total)
+    uf.staminaBar:update(current / total);
+  end)
+end
+
 function HFUnitFrame:create(parent, opts)
   local unitFrame = setmetatable({}, self)
 
@@ -47,11 +61,16 @@ function HFUnitFrame:create(parent, opts)
   if opts.width == nil then opts.width = 300 end
 
   -- emitter
-  EventEmitter:new(bar)
+  EventEmitter.init(bar)
 
   unitFrame.opts = opts
 
   render(unitFrame, parent)
+  listen(unitFrame)
 
   return unitFrame
+end
+
+function HFUnitFrame:addEventSource(es)
+  es:pipe(self)
 end

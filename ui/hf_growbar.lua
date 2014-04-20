@@ -87,7 +87,7 @@ function HFGrowbar:create(parent, opts)
   if opts.width == nil then opts.width = 300 end
 
   -- emitter
-  EventEmitter:new(bar)
+  EventEmitter.init(bar)
 
   bar.opts = opts
   bar.fill = 1

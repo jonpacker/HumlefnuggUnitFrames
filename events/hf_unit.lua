@@ -1,4 +1,4 @@
-local delegate = EventEmitter:new()
+local delegate = EventEmitter.init()
 local delegateGlobalEventTo = function(globalEvent, localEvent)
   EVENT_MANAGER:RegisterForEvent("HFUF", globalEvent, function(...)
     delegate:emit(localEvent, ...)
@@ -12,7 +12,7 @@ local eventSources = {}
 function HFUnitEventSource(unit)
   if eventSources[unit] != nil then return eventSources[unit] end
 
-  local es = eventSources[unit] = EventEmitter:new()
+  local es = eventSources[unit] = EventEmitter.init()
 
   delegate:on("power-update", function(eventCode, eventUnit, powerIndex, powerType, powerValue, powerMax, powerEffectiveMax)
     if unit ~= eventUnit then return end

@@ -13,3 +13,5 @@ HumlefnuggUnitFrames.xml
 ui/hfuf_render.lua
 ui/hf_growbar.lua
 ui/hf_unit_frame.lua
+
+events/hf_unit.lua
