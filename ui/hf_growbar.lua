@@ -77,6 +77,42 @@ local animateGlowOnChange = function(bar)
   end)
 end
 
+local createCollapseTimeline = function(bar)
+  local timeline = ANIMATION_MANAGER:CreateTimeline()
+
+  local collapseControl = function(control)
+    local anim = timeline:InsertAnimation(ANIMATION_SIZE, control, 0)
+    anim:SetEasingFunction(bar.opts.collapseEasing)
+    anim:SetDuration(bar.opts.collapseTime)
+    anim:SetStartAndEndWidth(control:GetWidth(), control:GetWidth())
+    anim:SetStartAndEndHeight(control:GetHeight(), 0)
+    return anim
+  end
+
+  local collapsedControls = { bar.container, bar.bar, bar.gain, bar.lose }
+  local collapseAnims = {}
+  for i = 1, #collapsedControls do 
+    collapseAnims[i] = collapseControl(collapsedControls[i])
+  end
+
+  local updateWidths = function()
+    for i, control in ipairs(collapsedControls) do
+      collapseAnims[i]:SetStartAndEndWidth(control:GetWidth(), control:GetWidth())
+    end
+  end
+
+  bar:on('collapse', function() 
+    if timeline:IsPlaying() then timeline:PlayInstantlyToEnd() end
+    updateWidths()
+    timeline:PlayForward()
+  end)
+  bar:on('expand', function() 
+    if timeline:IsPlaying() then timeline:PlayInstantlyToEnd() end
+    updateWidths()
+    timeline:PlayBackward()
+  end)
+end
+
 local render = function(bar, parent)
   local container = WINDOW_MANAGER:CreateControl(getUniqueName("container"), parent, CT_TEXTURE)
   local fillBar = WINDOW_MANAGER:CreateControl(getUniqueName("bar"), container, CT_TEXTURE)
@@ -106,6 +142,10 @@ local render = function(bar, parent)
 
   animateWidthChange(bar)
   animateGlowOnChange(bar)
+
+  if bar.opts.collapsible then
+    createCollapseTimeline(bar)
+  end
 end
 
 local defaults = {
@@ -118,6 +158,9 @@ local defaults = {
   glowMaxAlpha = 0.5;  -- max alpha of diff indicator
   height = 30; 
   width = 300;
+  collapsible = false;
+  collapseEasing = ZO_EaseInOutCubic;
+  collapseTime = 300;
 };
 defaults.__index = defaults;
 
@@ -141,4 +184,16 @@ end
 function HFGrowbar:update(newValue, immediate)
   self:emit("update", newValue, immediate)
   self.value = newValue;
+end
+
+function HFGrowbar:expand()
+  if self.opts.collapsible then
+    self:emit('expand')
+  end
+end
+
+function HFGrowbar:collapse()
+  if self.opts.collapsible then
+    self:emit('collapse')
+  end
 end

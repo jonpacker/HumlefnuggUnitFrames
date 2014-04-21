@@ -72,14 +72,70 @@ local renderUnitCaption = function(uf)
   uf.unitName:SetVerticalAlignment(TEXT_ALIGN_BOTTOM)
 end
 
+local getFrameHeight = function(uf, showMagicka, showStamina)
+  local height = uf.opts.padding * 2 + uf.opts.healthHeight
+  if showMagicka then height = height + uf.opts.magickaHeight + uf.opts.padding end
+  if showStamina then height = height + uf.opts.staminaHeight + uf.opts.padding end
+  return height
+end
+
+local createCollapseTimeline = function(uf)
+  local timeline = ANIMATION_MANAGER:CreateTimeline()
+  local frameCollapse = timeline:InsertAnimation(ANIMATION_SIZE, uf.container, 0)
+
+  frameCollapse:SetStartAndEndWidth(uf.container:GetWidth(), uf.container:GetWidth())
+  frameCollapse:SetStartAndEndHeight(getFrameHeight(uf, true, true), getFrameHeight(uf, false, false))
+  frameCollapse:SetEasingFunction(ZO_EaseInOutCubic)
+  frameCollapse:SetDuration(uf.opts.collapseAnimationDuration)
+
+  local magickaIsFull = uf.unit.magicka == uf.unit.magickaMax
+  local staminaIsFull = uf.unit.stamina == uf.unit.staminaMax
+  local currentlyShowing = true
+
+  local setBarsDisplaying = function(show)
+    currentlyShowing = show
+
+    if timeline:IsPlaying() then timeline:PlayInstantlyToEnd() end
+
+    if show then
+      uf.magickaBar:expand()
+      uf.staminaBar:expand()
+      timeline:PlayBackward()
+    else
+      uf.magickaBar:collapse()
+      uf.staminaBar:collapse()
+      timeline:PlayForward()
+    end
+  end
+
+  local updateBarsDisplaying = function()
+    if magickaIsFull and staminaIsFull and currentlyShowing then
+      setBarsDisplaying(false)
+    elseif (not magickaIsFull or not staminaIsFull) and not currentlyShowing then
+      setBarsDisplaying(true)
+    end
+  end
+
+  uf.unit:on('magicka-update', function(magicka, magickaMax)
+    magickaIsFull = magicka == magickaMax
+    updateBarsDisplaying()
+  end)
+  uf.unit:on('stamina-update', function(stamina, staminaMax)
+    staminaIsFull = stamina == staminaMax
+    updateBarsDisplaying()
+  end)
+
+  updateBarsDisplaying()
+end
+
 local render = function(uf, parent)
   local container = WINDOW_MANAGER:CreateControl(getUniqueName("container"), parent, CT_TEXTURE)
 
   container:SetColor(unpack(uf.opts.restingBg))
+  container:SetDimensions(uf.opts.width, getFrameHeight(uf, uf.unit.hasMagicka, uf.unit.hasStamina))
 
   uf.container = container
 
-  local containerHeight = uf.opts.padding * 2 + uf.opts.healthHeight
   local barWidth = uf.opts.width - uf.opts.padding * 2
 
   uf.healthBar = HFGrowbar:create(container, {
@@ -95,9 +151,9 @@ local render = function(uf, parent)
       fgColour = { 38/255, 94/255, 176/255, 1 };
       bgColour = { 30/255, 30/255, 30/255, 1 };
       width = barWidth;
+      collapsible = uf.opts.hidePowerWhenFull;
       height = uf.opts.magickaHeight;
     })
-    containerHeight = containerHeight + uf.opts.magickaHeight + uf.opts.padding
     uf.magickaBar.container:SetAnchor(TOPLEFT, uf.healthBar.container, BOTTOMLEFT, 0, uf.opts.padding)
   end
 
@@ -106,14 +162,17 @@ local render = function(uf, parent)
       fgColour = { 84/255, 189/255, 2/255, 1 };
       bgColour = { 30/255, 30/255, 30/255, 1 };
       width = barWidth;
+      collapsible = uf.opts.hidePowerWhenFull;
       height = uf.opts.staminaHeight
     })
-    containerHeight = containerHeight + uf.opts.staminaHeight + uf.opts.padding
     -- assumes that the magicka bar exists, but i'm not sure there's any units that will have stamina without magicka.
     uf.staminaBar.container:SetAnchor(TOPLEFT, uf.magickaBar.container, BOTTOMLEFT, 0, uf.opts.padding)
   end
 
-  container:SetDimensions(uf.opts.width, containerHeight)
+  if uf.opts.hidePowerWhenFull and uf.unit.hasStamina and uf.unit.hasMagicka then
+    createCollapseTimeline(uf)
+  end
+
 
   renderUnitName(uf)
 
@@ -159,12 +218,14 @@ local defaults = {
   padding = 3;
   caption = false;
   indicateHealthChange = false;
-  restingBg = { 54/255, 54/255, 54/255, 0.4 };
+  restingBg = { 54/255, 54/255, 54/255, 0.65 };
   combatBg = { 90/255, 54/255, 54/255, 0.9 };
   unitNameFontSize = 20;
   unitCaptionFontSize = 14;
   healthChangeIndicatorFontSize = 22;
   dimUnitNameOnCombat = true;
+  hidePowerWhenFull = true;
+  collapseAnimationDuration = 300;
   font = "HumlefnuggUnitFrames/libs/AlegreyaSansSC-ExtraBold.ttf";
 };
 defaults.__index = defaults;
