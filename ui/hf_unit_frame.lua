@@ -27,7 +27,7 @@ local renderHealthChangeIndicator = function(uf)
   healthChange:SetAnchor(TOPRIGHT, uf.healthBar.container, TOPRIGHT, -10, 0)
   healthChange:SetVerticalAlignment(TEXT_ALIGN_CENTER);
   healthChange:SetHorizontalAlignment(TEXT_ALIGN_RIGHT);
-  healthChange:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.nameFont, math.floor(uf.opts.healthHeight / 2)))
+  healthChange:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, math.floor(uf.opts.healthHeight / 2)))
   healthChange:SetColor(255/255, 222/255, 78/255, 1);
 
   local fadeOutTimeline = ANIMATION_MANAGER:CreateTimeline()
@@ -92,7 +92,7 @@ local render = function(uf, parent)
   charName:SetDimensions(barWidth / 2, uf.healthBar.opts.height)
   charName:SetSimpleAnchorParent(10, 0);
   charName:SetVerticalAlignment(TEXT_ALIGN_CENTER);
-  charName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.nameFont, math.floor(uf.opts.healthHeight / 2)))
+  charName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, math.floor(uf.opts.healthHeight / 2)))
   charName:SetColor(1, 1, 1, 1);
   uf.charName = charName;
 
@@ -131,10 +131,11 @@ local defaults = {
   staminaHeight = 25;
   width = 360;
   padding = 3;
+  caption = false;
   indicateHealthChange = false;
   restingBg = { 54/255, 54/255, 54/255, 0.4 };
   combatBg = { 90/255, 54/255, 54/255, 0.9 };
-  nameFont = "HumlefnuggUnitFrames/libs/AlegreyaSansSC-ExtraBold.ttf";
+  font = "HumlefnuggUnitFrames/libs/AlegreyaSansSC-ExtraBold.ttf";
 };
 defaults.__index = defaults;
 
