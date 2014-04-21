@@ -12,7 +12,7 @@ function HFUF:create(parent)
   self.targetFrame = HFUnitFrame:create(parent, HFUnitModel:get('reticleover', 'target-changed'), {
     indicateHealthChange = true;
     caption = true;
-    dimUnitNameInCombat = false;
+    dimUnitNameOnCombat = false;
   })
   self.targetFrame.container:SetAnchor(TOPRIGHT, parent, TOPRIGHT, 0, 0)
 
