@@ -40,7 +40,7 @@ local updateUnit = function(unit)
 
   unit.decoratedName = unit.name
   if unit.difficultyRank and unit.difficultyRank > 0 then
-    unit.decorated = unit.decoratedName .. " (" .. unit.difficultyDecoration .. ")"
+    unit.decoratedName = unit.decoratedName .. " (" .. unit.difficultyDecoration .. ")"
   end
 
   unit.caption = unit.veteran and "VR"..unit.veteranRank or tostring(unit.level)
