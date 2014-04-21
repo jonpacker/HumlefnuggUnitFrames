@@ -33,12 +33,12 @@ local updateUnit = function(unit)
     unit.difficultyDecoration = ""
     -- stole this bit from FTC. credit to them!
     unit.difficultyRank = math.max(GetUnitDifficulty(unit.unit) - 1, 0)
-    for i = 1, unit.difficultyRank do unit.difficultyDecoration = unit.difficultyDecoration .. "☠" end
+    for i = 1, unit.difficultyRank do unit.difficultyDecoration = unit.difficultyDecoration .. "!" end
   else
     unit.difficulty, unit.difficultyDecoration, unit.difficultyRank = nil, nil, nil
   end
 
-  unit.decoratedName = unit.difficulty and unit.name .. " " .. unit.difficultyDecoration or unit.name
+  unit.decoratedName = unit.difficulty and unit.name .. " (" .. unit.difficultyDecoration .. ")" or unit.name
 
   unit.caption = unit.veteran and "VR"..unit.veteranRank or tostring(unit.level)
 

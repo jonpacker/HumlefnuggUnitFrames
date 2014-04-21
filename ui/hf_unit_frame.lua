@@ -164,6 +164,7 @@ local defaults = {
   unitNameFontSize = 20;
   unitCaptionFontSize = 14;
   healthChangeIndicatorFontSize = 22;
+  dimUnitNameOnCombat = true;
   font = "HumlefnuggUnitFrames/libs/AlegreyaSansSC-ExtraBold.ttf";
 };
 defaults.__index = defaults;
@@ -183,15 +184,14 @@ end
 
 function HFUnitFrame:setCombatState(combat)
   if combat then
-    self.unitName:SetAlpha(0.1)
+    if self.opts.dimUnitNameOnCombat then self.unitName:SetAlpha(0.1) end
     self.container:SetColor(unpack(self.opts.combatBg))
   else
-    self.unitName:SetAlpha(1)
+    if self.opts.dimUnitNameOnCombat then self.unitName:SetAlpha(1) end
     self.container:SetColor(unpack(self.opts.restingBg))
   end
 end
 
 function HFUnitFrame:reloadTarget()
   uf.unitName:SetText(GetUnitName(self.unit):upper())
-
 end
