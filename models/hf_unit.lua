@@ -26,6 +26,7 @@ local updateUnit = function(unit)
   unit.veteranRank = GetUnitVeteranRank(unit.unit)
   unit.class = GetUnitClass(unit.unit)
   unit.race = GetUnitRace(unit.unit)
+  unit.desc = GetUnitCaption(unit.unit)
 
   if GetUnitDifficulty(unit.unit) then
     unit.difficulty = difficulties[GetUnitDifficulty(unit.unit)]
@@ -40,7 +41,8 @@ local updateUnit = function(unit)
   unit.decoratedName = unit.difficulty and unit.name .. " " .. unit.difficultyDecoration or unit.name
 
   unit.caption = unit.veteran and "VR"..unit.veteranRank or tostring(unit.level)
-  
+
+  if unit.desc then unit.caption = unit.caption .. " " .. unit.desc end
   if unit.race then unit.caption = unit.caption .. " " .. unit.race end
   if unit.class then unit.caption = unit.caption .. " " .. unit.class end
 
