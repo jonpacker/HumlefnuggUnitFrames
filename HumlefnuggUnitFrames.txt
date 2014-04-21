@@ -6,6 +6,7 @@ HumlefnuggUnitFrames.lua
 HumlefnuggUnitFrames.xml
 
 libs/emitter.lua
+libs/hf_debounce.lua
 
 ui/hfuf_render.lua
 ui/hf_growbar.lua

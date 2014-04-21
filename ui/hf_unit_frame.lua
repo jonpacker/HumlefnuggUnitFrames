@@ -88,14 +88,22 @@ local createCollapseTimeline = function(uf)
   frameCollapse:SetEasingFunction(ZO_EaseInOutCubic)
   frameCollapse:SetDuration(uf.opts.collapseAnimationDuration)
 
+  local disappearBar = function(bar)
+    local disappear = timeline:InsertAnimation(ANIMATION_ALPHA, bar, 0)
+    disappear:SetEasingFunction(ZO_EaseInOutCubic)
+    disappear:SetDuration(uf.opts.collapseAnimationDuration)
+    disappear:SetAlphaValues(1, 0)
+  end
+
+  disappearBar(uf.magickaBar.container)
+  disappearBar(uf.staminaBar.container)
+
   local magickaIsFull = uf.unit.magicka == uf.unit.magickaMax
   local staminaIsFull = uf.unit.stamina == uf.unit.staminaMax
   local currentlyShowing = true
 
   local setBarsDisplaying = function(show)
     currentlyShowing = show
-
-    if timeline:IsPlaying() then timeline:PlayInstantlyToEnd() end
 
     if show then
       uf.magickaBar:expand()
@@ -108,13 +116,13 @@ local createCollapseTimeline = function(uf)
     end
   end
 
-  local updateBarsDisplaying = function()
+  local updateBarsDisplaying = hf_debounce(function()
     if magickaIsFull and staminaIsFull and currentlyShowing then
       setBarsDisplaying(false)
     elseif (not magickaIsFull or not staminaIsFull) and not currentlyShowing then
       setBarsDisplaying(true)
     end
-  end
+  end, 500, true)
 
   uf.unit:on('magicka-update', function(magicka, magickaMax)
     magickaIsFull = magicka == magickaMax
