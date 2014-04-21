@@ -3,6 +3,13 @@ HFUnitModel.__index = HFUnitModel
 
 local unitModelPool = {}
 
+local difficulties = {}
+difficulties[MONSTER_DIFFICULTY_DEADLY] = 'deadly'
+difficulties[MONSTER_DIFFICULTY_EASY] = 'easy'
+difficulties[MONSTER_DIFFICULTY_HARD] = 'hard'
+difficulties[MONSTER_DIFFICULTY_NONE] = ''
+difficulties[MONSTER_DIFFICULTY_NORMAL] = 'normal'
+
 local updateUnit = function(unit)
   unit.name = GetUnitName(unit.unit)
 
@@ -15,6 +22,28 @@ local updateUnit = function(unit)
   end
 
   unit.level = GetUnitLevel(unit.unit)
+  unit.veteran = IsUnitVeteran(unit.unit)
+  unit.veteranRank = GetUnitVeteranRank(unit.unit)
+  unit.class = GetUnitClass(unit.unit)
+  unit.race = GetUnitRace(unit.unit)
+
+  if GetUnitDifficulty(unit.unit) then
+    unit.difficulty = difficulties[GetUnitDifficulty(unit.unit)]
+    unit.difficultyDecoration = ""
+    -- stole this bit from FTC. credit to them!
+    unit.difficultyRank = math.max(GetUnitDifficulty(unit.unit) - 1, 0)
+    for i = 1, unit.difficultyRank do unit.difficultyDecoration = unit.difficultyDecoration .. "☠" end
+  else
+    unit.difficulty, unit.difficultyDecoration, unit.difficultyRank = nil, nil, nil
+  end
+
+  unit.decoratedName = unit.difficulty and unit.name .. " " .. unit.difficultyDecoration or unit.name
+
+  unit.caption = unit.veteran and "VR"..unit.veteranRank or tostring(unit.level)
+  
+  if unit.race then unit.caption = unit.caption .. " " .. unit.race end
+  if unit.class then unit.caption = unit.caption .. " " .. unit.class end
+
   unit.health, unit.healthMax, unit.healthEffectiveMax = GetUnitPower(unit.unit, POWERTYPE_HEALTH)
   unit.hasMagicka = GetUnitPower(unit.unit, POWERTYPE_MAGICKA) ~= 0
   unit.hasStamina = GetUnitPower(unit.unit, POWERTYPE_STAMINA) ~= 0
