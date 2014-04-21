@@ -60,14 +60,14 @@ end
 
 local renderUnitCaption = function(uf)
   uf.unitCaption = WINDOW_MANAGER:CreateControl(getUniqueName("unitCaption"), uf.healthBar.container, CT_LABEL)
-  uf.unitCaption:SetDimensions(uf.healthBar.container:GetWidth() / 2, uf.healthBar.opts.height / 2 - uf.opts.padding)
-  uf.unitCaption:SetAnchor(TOPLEFT, uf.unitName, BOTTOMLEFT, 0, uf.opts.padding * 2)
+  uf.unitCaption:SetDimensions(uf.healthBar.container:GetWidth() / 2, uf.healthBar.opts.height / 2)
+  uf.unitCaption:SetAnchor(TOPLEFT, uf.unitName, BOTTOMLEFT, 0, -3)
   uf.unitCaption:SetVerticalAlignment(TEXT_ALIGN_TOP)
   uf.unitCaption:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, math.floor(uf.opts.healthHeight / 4)))
   uf.unitCaption:SetColor(1, 1, 1, 1);
 
-  uf.unitName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, math.floor(uf.opts.healthHeight / 3)))
-  uf.unitName:SetDimensions(uf.healthBar.container:GetWidth() / 2, uf.healthBar.opts.height / 2 - uf.opts.padding)
+  uf.unitName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, math.floor(uf.opts.healthHeight / 2.5)))
+  uf.unitName:SetDimensions(uf.healthBar.container:GetWidth() / 2, uf.healthBar.opts.height / 1.8)
   uf.unitName:SetVerticalAlignment(TEXT_ALIGN_BOTTOM)
 end
 
@@ -150,9 +150,9 @@ local listen = function(uf)
 end
 
 local defaults = {
-  healthHeight = 40;
-  magickaHeight = 25;
-  staminaHeight = 25;
+  healthHeight = 50;
+  magickaHeight = 20;
+  staminaHeight = 20;
   width = 360;
   padding = 3;
   caption = false;

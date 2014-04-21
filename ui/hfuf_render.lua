@@ -11,9 +11,6 @@ function HFUF:create(parent)
 
   self.targetFrame = HFUnitFrame:create(parent, HFUnitModel:get('reticleover', 'target-changed'), {
     indicateHealthChange = true;
-    healthBarHeight = 60;
-    magickaBarHeight = 15;
-    staminaBarHeight = 15;
     caption = true;
   })
   self.targetFrame.container:SetAnchor(TOPRIGHT, parent, TOPRIGHT, 0, 0)
