@@ -33,7 +33,7 @@ local renderHealthChangeIndicator = function(uf)
   healthChange:SetAnchor(TOPRIGHT, uf.healthBar.container, TOPRIGHT, -10, 0)
   healthChange:SetVerticalAlignment(TEXT_ALIGN_CENTER);
   healthChange:SetHorizontalAlignment(TEXT_ALIGN_RIGHT);
-  healthChange:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, math.floor(uf.opts.healthHeight / 2)))
+  healthChange:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, uf.opts.healthChangeIndicatorFontSize))
   healthChange:SetColor(255/255, 222/255, 78/255, 1);
 
   local fadeOutTimeline = ANIMATION_MANAGER:CreateTimeline()
@@ -56,7 +56,7 @@ local renderUnitName = function(uf)
   uf.unitName:SetDimensions(uf.healthBar.container:GetWidth() / 2, uf.healthBar.opts.height)
   uf.unitName:SetSimpleAnchorParent(10, 0);
   uf.unitName:SetVerticalAlignment(TEXT_ALIGN_CENTER);
-  uf.unitName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, math.floor(uf.opts.healthHeight / 2)))
+  uf.unitName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, uf.opts.unitNameFontSize))
   uf.unitName:SetColor(1, 1, 1, 1);
 end
 
@@ -65,10 +65,9 @@ local renderUnitCaption = function(uf)
   uf.unitCaption:SetDimensions(uf.healthBar.container:GetWidth(), uf.healthBar.opts.height / 2)
   uf.unitCaption:SetAnchor(TOPLEFT, uf.unitName, BOTTOMLEFT, 0, -3)
   uf.unitCaption:SetVerticalAlignment(TEXT_ALIGN_TOP)
-  uf.unitCaption:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, math.floor(uf.opts.healthHeight / 4)))
+  uf.unitCaption:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, uf.opts.unitCaptionFontSize))
   uf.unitCaption:SetColor(1, 1, 1, 1);
 
-  uf.unitName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, math.floor(uf.opts.healthHeight / 2.5)))
   uf.unitName:SetDimensions(uf.healthBar.container:GetWidth() / 2, uf.healthBar.opts.height / 1.8)
   uf.unitName:SetVerticalAlignment(TEXT_ALIGN_BOTTOM)
 end
@@ -131,7 +130,7 @@ end
 
 local listen = function(uf)
   uf.unit:on('health-update', function(current, total)
-    updateUnitCaptionText();
+    updateUnitCaptionText(uf);
     uf.healthBar:update(current / total);
   end)
 
@@ -162,6 +161,9 @@ local defaults = {
   indicateHealthChange = false;
   restingBg = { 54/255, 54/255, 54/255, 0.4 };
   combatBg = { 90/255, 54/255, 54/255, 0.9 };
+  unitNameFontSize = 20;
+  unitCaptionFontSize = 14;
+  healthChangeIndicatorFontSize = 22;
   font = "HumlefnuggUnitFrames/libs/AlegreyaSansSC-ExtraBold.ttf";
 };
 defaults.__index = defaults;
