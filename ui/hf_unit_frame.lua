@@ -14,8 +14,12 @@ local updateIdentity = function(uf, parent)
   end
 
   uf.container:SetHidden(false)
-  uf.charName:SetText(uf.unit.name)
+  uf.unitName:SetText(uf.unit.decoratedName)
   uf.healthBar:update(uf.unit.health / uf.unit.healthMax, true)
+
+  if uf.opts.caption then
+    uf.unitCaption:SetText(uf.unit.caption)
+  end
 
   if uf.unit.hasMagicka then uf.magickaBar:update(uf.unit.magicka / uf.unit.magickaMax, true) end
   if uf.unit.hasStamina then uf.staminaBar:update(uf.unit.stamina / uf.unit.staminaMax, true) end
@@ -43,6 +47,28 @@ local renderHealthChangeIndicator = function(uf)
     healthChange:SetText(string.format("%s%d", sign, math.abs(uf.unit.healthDiff)))
     fadeOutTimeline:PlayFromStart()
   end)
+end
+
+local renderUnitName = function(uf)
+  uf.unitName = WINDOW_MANAGER:CreateControl(getUniqueName("unitName"), uf.healthBar.container, CT_LABEL)
+  uf.unitName:SetDimensions(uf.healthBar.container:GetWidth() / 2, uf.healthBar.opts.height)
+  uf.unitName:SetSimpleAnchorParent(10, 0);
+  uf.unitName:SetVerticalAlignment(TEXT_ALIGN_CENTER);
+  uf.unitName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, math.floor(uf.opts.healthHeight / 2)))
+  uf.unitName:SetColor(1, 1, 1, 1);
+end
+
+local renderUnitCaption = function(uf)
+  uf.unitCaption = WINDOW_MANAGER:CreateControl(getUniqueName("unitCaption"), uf.healthBar.container, CT_LABEL)
+  uf.unitCaption:SetDimensions(uf.healthBar.container:GetWidth() / 2, uf.healthBar.opts.height / 2 - uf.opts.padding)
+  uf.unitCaption:SetAnchor(TOPLEFT, uf.unitName, BOTTOMLEFT, 0, uf.opts.padding * 2)
+  uf.unitCaption:SetVerticalAlignment(TEXT_ALIGN_TOP)
+  uf.unitCaption:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, math.floor(uf.opts.healthHeight / 4)))
+  uf.unitCaption:SetColor(1, 1, 1, 1);
+
+  uf.unitName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, math.floor(uf.opts.healthHeight / 3)))
+  uf.unitName:SetDimensions(uf.healthBar.container:GetWidth() / 2, uf.healthBar.opts.height / 2 - uf.opts.padding)
+  uf.unitName:SetVerticalAlignment(TEXT_ALIGN_BOTTOM)
 end
 
 local render = function(uf, parent)
@@ -88,13 +114,11 @@ local render = function(uf, parent)
 
   container:SetDimensions(uf.opts.width, containerHeight)
 
-  local charName = WINDOW_MANAGER:CreateControl(getUniqueName("charname"), uf.healthBar.container, CT_LABEL)
-  charName:SetDimensions(barWidth / 2, uf.healthBar.opts.height)
-  charName:SetSimpleAnchorParent(10, 0);
-  charName:SetVerticalAlignment(TEXT_ALIGN_CENTER);
-  charName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, math.floor(uf.opts.healthHeight / 2)))
-  charName:SetColor(1, 1, 1, 1);
-  uf.charName = charName;
+  renderUnitName(uf)
+
+  if uf.opts.caption then
+    renderUnitCaption(uf)
+  end
 
   if uf.opts.indicateHealthChange then
     renderHealthChangeIndicator(uf)
@@ -154,15 +178,15 @@ end
 
 function HFUnitFrame:setCombatState(combat)
   if combat then
-    self.charName:SetAlpha(0.1)
+    self.unitName:SetAlpha(0.1)
     self.container:SetColor(unpack(self.opts.combatBg))
   else
-    self.charName:SetAlpha(1)
+    self.unitName:SetAlpha(1)
     self.container:SetColor(unpack(self.opts.restingBg))
   end
 end
 
 function HFUnitFrame:reloadTarget()
-  uf.charName:SetText(GetUnitName(self.unit):upper())
+  uf.unitName:SetText(GetUnitName(self.unit):upper())
 
 end
