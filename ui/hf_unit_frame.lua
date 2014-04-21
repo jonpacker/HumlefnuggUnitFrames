@@ -7,6 +7,11 @@ local getUniqueName = function(hint)
   return "HFUnitFrame_control_"..hint.."_"..controlCounter
 end
 
+local updateUnitCaptionText = function(uf)
+  if not uf.opts.caption then return end
+  uf.unitCaption:SetText(string.format("%s (%d/%d)", uf.unit.caption, uf.unit.health, uf.unit.healthMax))
+end
+
 local updateIdentity = function(uf, parent)
   if not uf.unit.exists then
     uf.container:SetHidden(true)
@@ -16,10 +21,7 @@ local updateIdentity = function(uf, parent)
   uf.container:SetHidden(false)
   uf.unitName:SetText(uf.unit.decoratedName)
   uf.healthBar:update(uf.unit.health / uf.unit.healthMax, true)
-
-  if uf.opts.caption then
-    uf.unitCaption:SetText(uf.unit.caption)
-  end
+  updateUnitCaptionText(uf)
 
   if uf.unit.hasMagicka then uf.magickaBar:update(uf.unit.magicka / uf.unit.magickaMax, true) end
   if uf.unit.hasStamina then uf.staminaBar:update(uf.unit.stamina / uf.unit.staminaMax, true) end
@@ -60,7 +62,7 @@ end
 
 local renderUnitCaption = function(uf)
   uf.unitCaption = WINDOW_MANAGER:CreateControl(getUniqueName("unitCaption"), uf.healthBar.container, CT_LABEL)
-  uf.unitCaption:SetDimensions(uf.healthBar.container:GetWidth() / 2, uf.healthBar.opts.height / 2)
+  uf.unitCaption:SetDimensions(uf.healthBar.container:GetWidth(), uf.healthBar.opts.height / 2)
   uf.unitCaption:SetAnchor(TOPLEFT, uf.unitName, BOTTOMLEFT, 0, -3)
   uf.unitCaption:SetVerticalAlignment(TEXT_ALIGN_TOP)
   uf.unitCaption:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, math.floor(uf.opts.healthHeight / 4)))
@@ -129,6 +131,7 @@ end
 
 local listen = function(uf)
   uf.unit:on('health-update', function(current, total)
+    updateUnitCaptionText();
     uf.healthBar:update(current / total);
   end)
 
