@@ -90,9 +90,9 @@ local shouldHidePowerBars = function(uf)
 end
 
 local getCalculatedCurrentHeight = function(uf)
-  local showPowerBars = shouldHidePowerBars(uf)
+  local showPowerBars = not shouldHidePowerBars(uf)
   local showMountBar = uf.unit.hasMount and uf.unit.isMounted
-  return getFrameHeight(uf, showPowerBars, showMountBar)
+  return getFrameHeight(uf, showPowerBars, showPowerBars, showMountBar)
 end
 
 local createCollapseTimeline = function(uf)
@@ -108,48 +108,61 @@ local createCollapseTimeline = function(uf)
     local disappear = timeline:InsertAnimation(ANIMATION_ALPHA, bar, 0)
     disappear:SetEasingFunction(ZO_EaseInOutCubic)
     disappear:SetDuration(uf.opts.collapseAnimationDuration)
-    disappear:SetAlphaValues(1, 0)
+    disappear:SetAlphaValues(1, 1) 
+    return disappear
   end
 
-  if uf.unit.hasMagicka then disappearBar(uf.magickaBar.container) end
-  if uf.unit.hasStamina then disappearBar(uf.staminaBar.container) end
-  if uf.unit.hasMount then disappearBar(uf.mountStaminaBar.container) end
+  local disappearMagicka, disappearStamina, disappearMount
+  if uf.unit.hasMagicka then disappearMagicka = disappearBar(uf.magickaBar.container) end
+  if uf.unit.hasStamina then disappearStamina = disappearBar(uf.staminaBar.container) end
+  if uf.unit.hasMount then disappearMount = disappearBar(uf.mountStaminaBar.container) end
  
   local powerBarsHidden = false
   local mountBarHidden = false
 
   local updateCurrentHeight = function(height)
     local powerBarsShouldBeHidden = shouldHidePowerBars(uf)
-    local mountBarShouldBeHidden = uf.unit.isMounted
+    local mountBarShouldBeHidden = uf.unit.hasMount and not uf.unit.isMounted
 
     if powerBarsShouldBeHidden and not powerBarsHidden then
       if uf.magickaBar then uf.magickaBar:collapse() end
       if uf.staminaBar then uf.staminaBar:collapse() end
+      if disappearMagicka then disappearMagicka:SetAlphaValues(1, 0) end
+      if disappearStamina then disappearStamina:SetAlphaValues(1, 0) end
       powerBarsHidden = true
     elseif not powerBarsShouldBeHidden and powerBarsHidden then
       if uf.magickaBar then uf.magickaBar:expand() end
       if uf.staminaBar then uf.staminaBar:expand() end
+      if disappearMagicka then disappearMagicka:SetAlphaValues(0, 1) end
+      if disappearStamina then disappearStamina:SetAlphaValues(0, 1) end
       powerBarsHidden = false
+    else
+      if disappearMagicka then disappearMagicka:SetAlphaValues(1, 1) end
+      if disappearStamina then disappearStamina:SetAlphaValues(1, 1) end
     end
 
     if mountBarShouldBeHidden and not mountBarHidden then
       uf.mountStaminaBar:collapse()
+      disappearMount:SetAlphaValues(1, 0)
       mountBarHidden = true
     elseif not mountBarShouldBeHidden and mountBarHidden then
       uf.mountStaminaBar:expand()
+      disappearMount:SetAlphaValues(0, 1)
       mountBarHidden = false
+    else
+      if disappearMount then disappearMount:SetAlphaValues(1, 1) end
     end
 
     frameCollapse:SetStartAndEndHeight(uf.container:GetHeight(), height)
-    timeline:PlayForward()
+    timeline:PlayFromStart()
   end
 
-  local updateBarsDisplaying = hf_debounce(function()
+  local updateBarsDisplaying = function()
     local calculatedHeight = getCalculatedCurrentHeight(uf)
     if calculatedHeight ~= uf.container:GetHeight() then
       updateCurrentHeight(calculatedHeight)
     end
-  end, 50)
+  end
 
   uf.unit:on('magicka-update', updateBarsDisplaying)
   uf.unit:on('stamina-update', updateBarsDisplaying)
@@ -208,8 +221,8 @@ local render = function(uf, parent)
       collapsible = uf.opts.hidePowerWhenFull;
       height = uf.opts.mountStaminaHeight;
     })
-    -- again, I'm assuming you will only have access to a mount data on the first person. this will break if that changes.
-    uf.mountStaminaBar.container:SetAnchor(TOPLEFT, uf.magickaBar.container, BOTTOMLEFT, 0, uf.opts.padding)
+    -- anchoring bottom to bottom seems to be seriously broken. [Bugs, in my ESO?! It's more likely than you think.]
+    uf.mountStaminaBar.container:SetAnchor(TOP, container, BOTTOM, 0, -1 * (uf.opts.padding + uf.opts.mountStaminaHeight))
   end
 
   createCollapseTimeline(uf);
@@ -258,7 +271,7 @@ local defaults = {
   healthHeight = 50;
   magickaHeight = 20;
   staminaHeight = 20;
-  mountStaminaHeight = 20;
+  mountStaminaHeight = 30;
   width = 360;
   padding = 3;
   caption = false;
