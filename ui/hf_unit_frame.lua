@@ -82,8 +82,9 @@ end
 
 local shouldHidePowerBars = function(uf)
   if not uf.opts.hidePowerWhenFull then return false end
-  if uf.unit.magicka ~= uf.unit.magickaMax then return false end
-  if uf.unit.stamina ~= uf.unit.staminaMax then return false end
+  if not uf.unit.hasMagicka and not uf.unit.hasStamina then return false end
+  if uf.unit.hasMagicka and uf.unit.magicka ~= uf.unit.magickaMax then return false end
+  if uf.unit.hasStamina and uf.unit.stamina ~= uf.unit.staminaMax then return false end
   if uf.unit.inCombat then return false end
   return true
 end
