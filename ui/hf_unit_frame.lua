@@ -123,12 +123,12 @@ local createCollapseTimeline = function(uf)
     local mountBarShouldBeHidden = uf.unit.isMounted
 
     if powerBarsShouldBeHidden and not powerBarsHidden then
-      uf.magickaBar:collapse()
-      uf.staminaBar:collapse()
+      uf.magickaBar and uf.magickaBar:collapse()
+      uf.staminaBar and uf.staminaBar:collapse()
       powerBarsHidden = true
     elseif not powerBarsShouldBeHidden and powerBarsHidden then
-      uf.magickaBar:expand()
-      uf.staminaBar:expand()
+      uf.magickaBar and uf.magickaBar:expand()
+      uf.staminaBar and uf.staminaBar:expand()
       powerBarsHidden = false
     end
 
