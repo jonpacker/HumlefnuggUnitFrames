@@ -19,6 +19,8 @@ function HFUnitEventSource(unit)
       eventName = "magicka-update"
     elseif powerType == POWERTYPE_STAMINA then
       eventName = "stamina-update"
+    elseif powerType == POWERTYPE_MOUNT_STAMINA then
+      eventName = "mount-stamina-update"
     end
 
     if eventName ~= nil then
