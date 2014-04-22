@@ -41,6 +41,9 @@ local animateGlowOnChange = function(bar)
       control:SetAlpha(bar.opts.glowMaxAlpha)
       control:SetWidth(0)
     end, 0)
+    timeline:InsertCallback(function()
+      control.animateTo = nil
+    end, bar.opts.glowTime)
 
     local disappear = timeline:InsertAnimation(ANIMATION_ALPHA, control, 0)
     disappear:SetDuration(bar.opts.glowTime)
@@ -66,12 +69,15 @@ local animateGlowOnChange = function(bar)
     if loseTimeline:IsPlaying() then loseTimeline:PlayInstantlyToEnd() end
 
     local widthDiff = (value - bar.value) * bar.opts.width
+    local animateTo = math.abs(widthDiff)
 
     if widthDiff < 0 then
-      loseExpand:SetStartAndEndWidth(0, math.abs(widthDiff))
+      loseExpand.animatingTo = animateTo
+      loseExpand:SetStartAndEndWidth(0, animateTo)
       loseTimeline:PlayFromStart()
     else
-      gainExpand:SetStartAndEndWidth(0, math.abs(widthDiff))
+      gainExpand.animatingTo = animateTo
+      gainExpand:SetStartAndEndWidth(0, animateTo)
       gainTimeline:PlayFromStart()
     end
   end)
@@ -97,7 +103,7 @@ local createCollapseTimeline = function(bar)
 
   local updateWidths = function()
     for i, control in ipairs(collapsedControls) do
-      collapseAnims[i]:SetStartAndEndWidth(control:GetWidth(), control:GetWidth())
+      collapseAnims[i]:SetStartAndEndWidth(control:GetWidth(), control.animatingTo or control:GetWidth())
     end
   end
 

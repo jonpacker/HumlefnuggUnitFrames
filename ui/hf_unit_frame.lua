@@ -101,18 +101,25 @@ local createCollapseTimeline = function(uf)
   local magickaIsFull = uf.unit.magicka == uf.unit.magickaMax
   local staminaIsFull = uf.unit.stamina == uf.unit.staminaMax
   local currentlyShowing = true
+  local awaitingHide = false
 
   local setBarsDisplaying = function(show)
     currentlyShowing = show
 
     if show then
+      awaitingHide = false
       uf.magickaBar:expand()
       uf.staminaBar:expand()
       timeline:PlayBackward()
     else
-      uf.magickaBar:collapse()
-      uf.staminaBar:collapse()
-      timeline:PlayForward()
+      awaitingHide = true
+      zo_callLater(function()
+        if not awaitingHide then return end
+        uf.magickaBar:collapse()
+        uf.staminaBar:collapse()
+        timeline:PlayForward()
+        awaitingHide = false
+      end, uf.opts.hidePowerDelay)
     end
   end
 
@@ -233,6 +240,7 @@ local defaults = {
   healthChangeIndicatorFontSize = 22;
   dimUnitNameOnCombat = true;
   hidePowerWhenFull = true;
+  hidePowerDelay = 1000;
   collapseAnimationDuration = 300;
   font = "HumlefnuggUnitFrames/libs/AlegreyaSansSC-ExtraBold.ttf";
 };
