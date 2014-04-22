@@ -131,10 +131,10 @@ local createCollapseTimeline = function(uf)
     end
 
     if mountBarShouldBeHidden and not mountBarHidden then
-      uf.mountBar:collapse()
+      uf.mountStaminaBar:collapse()
       mountBarHidden = true
     elseif not mountBarShouldBeHidden and mountBarHidden then
-      uf.mountBar:expand()
+      uf.mountStaminaBar:expand()
       mountBarHidden = false
     end
 
@@ -191,7 +191,7 @@ local render = function(uf, parent)
       fgColour = { 84/255, 189/255, 2/255, 1 };
       bgColour = { 30/255, 30/255, 30/255, 1 };
       width = barWidth;
-      collapsible = uf.opts.hidePowerWhenFull;
+      collapsible = true;
       height = uf.opts.staminaHeight
     })
     -- assumes that the magicka bar exists, but i'm not sure there's any units that will have stamina without magicka.
@@ -237,6 +237,10 @@ local listen = function(uf)
 
   uf.unit:on('stamina-update', function(current, total)
     uf.staminaBar:update(current / total);
+  end)
+
+  uf.unit:on('mount-stamina-update', function(current, total)
+    uf.mountStaminaBar:update(current / total);
   end)
 
   uf.unit:on('stats-update', function() 
