@@ -9,7 +9,6 @@ libs/emitter.lua
 libs/hf_debounce.lua
 
 ui/hf_growbar.lua
-ui/hf_unit_frame_power_bar.lua
 ui/hf_unit_frame.lua
 ui/hfuf_render.lua
 
