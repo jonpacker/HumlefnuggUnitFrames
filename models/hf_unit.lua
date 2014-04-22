@@ -12,7 +12,7 @@ difficulties[MONSTER_DIFFICULTY_NORMAL] = 'normal'
 
 -- Bloody stupid that ZOS removed this from the API. It's rather easy to use a super basic heuristic to work around it.
 -- I haven't found a case where this returns a false positive yet (`powerMax` should always be non-nil if the unit uses that power)
-local doesUnitUsePowerType(unit, powertype)
+local doesUnitUsePowerType = function(unit, powertype)
   local powerValue, powerMax = GetUnitPower(unit, powertype);
   return powerValue ~= 0 and powerMax ~= nil
 end

@@ -80,18 +80,18 @@ local getFrameHeight = function(uf, showMagicka, showStamina, showMountStamina)
   return height
 end
 
-local getCalculatedCurrentHeight(uf)
-  local showPowerBars = shouldHidePowerBars(uf)
-  local showMountBar = uf.unit.hasMount and uf.unit.isMounted
-  return getFrameHeight(uf, showPowerBars, showMountBar)
-end
-
 local shouldHidePowerBars = function(uf)
   if not uf.opts.hidePowerWhenFull then return false end
   if uf.unit.magicka ~= uf.unit.magickaMax then return false end
   if uf.unit.stamina ~= uf.unit.staminaMax then return false end
   if uf.unit.inCombat then return false end
   return true
+end
+
+local getCalculatedCurrentHeight = function(uf)
+  local showPowerBars = shouldHidePowerBars(uf)
+  local showMountBar = uf.unit.hasMount and uf.unit.isMounted
+  return getFrameHeight(uf, showPowerBars, showMountBar)
 end
 
 local createCollapseTimeline = function(uf)
