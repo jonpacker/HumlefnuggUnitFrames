@@ -89,6 +89,7 @@ local updateUnit = function(unit)
 
   if unit.hasMount then
     updatePower(unit, 'mountStamina')(GetUnitPower(unit.unit, POWERTYPE_MOUNT_STAMINA))
+    unit.isMounted = unit.unit == 'player' and IsMounted()
   end
 end
 
@@ -100,6 +101,10 @@ local listenForChanges = function(unit, changeEvent)
 
   unit:on('stats-update', function()
     updateUnit(unit)
+  end)
+
+  unit:on('mount-update', function(mounted)
+    unit.isMounted = mounted
   end)
 
   if unit.unit == 'player' then

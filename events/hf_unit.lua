@@ -1,5 +1,6 @@
 HFEventDelegate:add(EVENT_POWER_UPDATE, "power-update")
 HFEventDelegate:add(EVENT_STATS_UPDATED, "stats-update")
+HFEventDelegate:add(EVENT_MOUNTED_STATE_CHANGED, "mount-update")
 
 local eventSources = {}
 
@@ -28,9 +29,17 @@ function HFUnitEventSource(unit)
     end
   end)
 
-  HFEventDelegate:on("stats-update", function()
-    es:emit("stats-update");
+  HFEventDelegate:on("stats-update", function(event, targetUnit)
+    if unit == targetUnit then
+      es:emit("stats-update")
+    end
   end)
+
+  if unit == "player" then
+    HFEventDelegate:on("mount-update", function(event, mounted)
+      es:emit("mount-update", mounted)
+    end)
+  end
 
   return es
 end
