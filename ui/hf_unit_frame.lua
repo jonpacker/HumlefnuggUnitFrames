@@ -72,11 +72,18 @@ local renderUnitCaption = function(uf)
   uf.unitName:SetVerticalAlignment(TEXT_ALIGN_BOTTOM)
 end
 
-local getFrameHeight = function(uf, showMagicka, showStamina)
+local getFrameHeight = function(uf, showMagicka, showStamina, showMountStamina)
   local height = uf.opts.padding * 2 + uf.opts.healthHeight
   if showMagicka then height = height + uf.opts.magickaHeight + uf.opts.padding end
   if showStamina then height = height + uf.opts.staminaHeight + uf.opts.padding end
+  if showMountStamina then height = height + uf.opts.mountStaminaHeight + uf.opts.padding end
   return height
+end
+
+local getCalculatedCurrentHeight(uf)
+  local showPowerBars = shouldHidePowerBars(uf)
+  local showMountBar = uf.unit.hasMount and uf.unit.isMounted
+  return getFrameHeight(uf, showPowerBars, showMountBar)
 end
 
 local shouldHidePowerBars = function(uf)
@@ -106,41 +113,46 @@ local createCollapseTimeline = function(uf)
   disappearBar(uf.magickaBar.container)
   disappearBar(uf.staminaBar.container)
 
-  local currentlyShowing = true
-  local awaitingHide = false
+  local powerBarsHidden = false
+  local mountBarHidden = false
 
-  local setBarsDisplaying = function(show)
-    currentlyShowing = show
+  local updateCurrentHeight = function(height)
+    local powerBarsShouldBeHidden = shouldHidePowerBars(uf)
+    local mountBarShouldBeHidden = uf.unit.isMounted
 
-    if show then
-      awaitingHide = false
+    if powerBarsShouldBeHidden and not powerBarsHidden then
+      uf.magickaBar:collapse()
+      uf.staminaBar:collapse()
+      powerBarsHidden = true
+    elseif not powerBarsShouldBeHidden and powerBarsHidden then
       uf.magickaBar:expand()
       uf.staminaBar:expand()
-      timeline:PlayBackward()
-    else
-      awaitingHide = true
-      zo_callLater(function()
-        if not awaitingHide then return end
-        uf.magickaBar:collapse()
-        uf.staminaBar:collapse()
-        timeline:PlayForward()
-        awaitingHide = false
-      end, uf.opts.hidePowerDelay)
+      powerBarsHidden = false
     end
+
+    if mountBarShouldBeHidden and not mountBarHidden then
+      uf.mountBar:collapse()
+      mountBarHidden = true
+    elseif not mountBarShouldBeHidden and mountBarHidden then
+      uf.mountBar:expand()
+      mountBarHidden = false
+    end
+
+    frameCollapse:SetStartAndEndHeight(uf.container:GetHeight(), height)
+    timeline:PlayForward()
   end
 
   local updateBarsDisplaying = hf_debounce(function()
-    local shouldHide = shouldHidePowerBars(uf)
-    if shouldHide and currentlyShowing then
-      setBarsDisplaying(false)
-    elseif not shouldHide and not currentlyShowing then
-      setBarsDisplaying(true)
+    local calculatedHeight = getCalculatedCurrentHeight(uf)
+    if calculatedHeight ~= uf.container:GetHeight() then
+      updateCurrentHeight(calculatedHeight)
     end
-  end, 100, true)
+  end, 50)
 
   uf.unit:on('magicka-update', updateBarsDisplaying)
   uf.unit:on('stamina-update', updateBarsDisplaying)
   uf.unit:on('combat-state', updateBarsDisplaying)
+  uf.unit.on('mount-update', updateBarsDisplaying)
 
   updateBarsDisplaying()
 end
@@ -186,10 +198,19 @@ local render = function(uf, parent)
     uf.staminaBar.container:SetAnchor(TOPLEFT, uf.magickaBar.container, BOTTOMLEFT, 0, uf.opts.padding)
   end
 
-  if uf.opts.hidePowerWhenFull and uf.unit.hasStamina and uf.unit.hasMagicka then
-    createCollapseTimeline(uf)
+  if uf.unit.hasMount then
+    uf.mountStaminaBar = HFGrowbar:create(container, {
+      fgColour = { 255/255, 180/255, 2/255, 1 };
+      bgColour = { 30/255, 30/255, 30/255, 1 };
+      width = barWidth;
+      collapsible = uf.opts.hidePowerWhenFull;
+      height = uf.opts.mountStaminaHeight;
+    })
+    -- again, I'm assuming you will only have access to a mount data on the first person. this will break if that changes.
+    uf.mountStaminaBar.container:SetAnchor(TOPLEFT, uf.magickaBar.container, BOTTOMLEFT, 0, uf.opts.padding)
   end
 
+  createCollapseTimeline(uf);
 
   renderUnitName(uf)
 
@@ -231,6 +252,7 @@ local defaults = {
   healthHeight = 50;
   magickaHeight = 20;
   staminaHeight = 20;
+  mountStaminaHeight = 20;
   width = 360;
   padding = 3;
   caption = false;
