@@ -8,9 +8,10 @@ HumlefnuggUnitFrames.xml
 libs/emitter.lua
 libs/hf_debounce.lua
 
-ui/hfuf_render.lua
 ui/hf_growbar.lua
+ui/hf_unit_frame_power_bar.lua
 ui/hf_unit_frame.lua
+ui/hfuf_render.lua
 
 events/hf_delegate.lua
 events/hf_unit.lua
