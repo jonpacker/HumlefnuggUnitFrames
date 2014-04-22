@@ -10,6 +10,29 @@ difficulties[MONSTER_DIFFICULTY_HARD] = 'hard'
 difficulties[MONSTER_DIFFICULTY_NONE] = ''
 difficulties[MONSTER_DIFFICULTY_NORMAL] = 'normal'
 
+-- Bloody stupid that ZOS removed this from the API. It's rather easy to use a super basic heuristic to work around it.
+-- I haven't found a case where this returns a false positive yet (`powerMax` should always be non-nil if the unit uses that power)
+local doesUnitUsePowerType(unit, powertype)
+  local powerValue, powerMax = GetUnitPower(unit, powertype);
+  return powerValue ~= 0 and powerMax ~= nil
+end
+
+function updatePower(unit, powerType)
+  return function(power, powerMax, powerEffectiveMax)
+    unit[powerType.."Outgoing"] = unit[powerType]
+    unit[powerType.."MaxOutgoing"] = unit[powerType.."Max"]
+    unit[powerType.."EffectiveMaxOutgoing"] = unit[powerType.."EffectiveMax"] 
+
+    if unit[powerType] ~= nil then
+      unit[powerType.."Diff"] = power - unit[powerType]
+      unit[powerType.."MaxDiff"] = powerMax - unit[powerType.."Max"]
+      unit[powerType.."EffectiveMaxDiff"] = powerEffectiveMax - unit[powerType.."EffectiveMax"]
+    end
+
+    unit[powerType], unit[powerType.."Max"], unit[powerType.."EffectiveMax"] = power, powerMax, powerEffectiveMax
+  end
+end
+
 local updateUnit = function(unit)
   unit.name = GetUnitName(unit.unit)
 
@@ -51,37 +74,29 @@ local updateUnit = function(unit)
   if unit.class then unit.caption = unit.caption .. " " .. unit.class end
 
   unit.health, unit.healthMax, unit.healthEffectiveMax = GetUnitPower(unit.unit, POWERTYPE_HEALTH)
-  unit.hasMagicka = GetUnitPower(unit.unit, POWERTYPE_MAGICKA) ~= 0
-  unit.hasStamina = GetUnitPower(unit.unit, POWERTYPE_STAMINA) ~= 0
+
+  unit.hasMagicka = doesUnitUsePowerType(unit.unit, POWERTYPE_MAGICKA)
+  unit.hasStamina = doesUnitUsePowerType(unit.unit, POWERTYPE_STAMINA)
+  unit.hasMount = doesUnitUsePowerType(unit.unit, POWERTYPE_MOUNT_STAMINA)
 
   if unit.hasStamina then
-    unit.stamina, unit.staminaMax, unit.staminaEffectiveMax = GetUnitPower(unit.unit, POWERTYPE_STAMINA)
-    unit.outgoingStamina = unit.stamina
+    updatePower(unit, 'stamina')(GetUnitPower(unit.unit, POWERTYPE_STAMINA))
   end
 
   if unit.hasMagicka then
-    unit.magicka, unit.magickaMax, unit.magickaEffectiveMax = GetUnitPower(unit.unit, POWERTYPE_MAGICKA)
-    unit.outgoingMagicka = unit.magicka
+    updatePower(unit, 'magicka')(GetUnitPower(unit.unit, POWERTYPE_MAGICKA))
   end
 
+  if unit.hasMount then
+    updatePower(unit, 'mountStamina')(GetUnitPower(unit.unit, POWERTYPE_MOUNT_STAMINA))
+  end
 end
 
 local listenForChanges = function(unit, changeEvent)
-  function updatePower(powerType)
-    return function(power, powerMax, powerEffectiveMax)
-      unit[powerType.."Outgoing"] = unit[powerType]
-      unit[powerType.."MaxOutgoing"] = unit[powerType.."Max"]
-      unit[powerType.."EffectiveMaxOutgoing"] = unit[powerType.."EffectiveMax"] 
-      unit[powerType.."Diff"] = power - unit[powerType]
-      unit[powerType.."MaxDiff"] = powerMax - unit[powerType.."Max"]
-      unit[powerType.."EffectiveMaxDiff"] = powerEffectiveMax - unit[powerType.."EffectiveMax"]
-      unit[powerType], unit[powerType.."Max"], unit[powerType.."EffectiveMax"] = power, powerMax, powerEffectiveMax
-    end
-  end
-
-  unit:on('magicka-update', updatePower('magicka'))
-  unit:on('stamina-update', updatePower('stamina'))
-  unit:on('health-update', updatePower('health'))
+  unit:on('magicka-update', updatePower(unit, 'magicka'))
+  unit:on('stamina-update', updatePower(unit, 'stamina'))
+  unit:on('health-update', updatePower(unit, 'health'))
+  unit:on('mount-stamina-update', updatePower(unit, 'mountStamina'))
 
   unit:on('stats-update', function()
     updateUnit(unit)
