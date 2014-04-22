@@ -110,9 +110,10 @@ local createCollapseTimeline = function(uf)
     disappear:SetAlphaValues(1, 0)
   end
 
-  disappearBar(uf.magickaBar.container)
-  disappearBar(uf.staminaBar.container)
-
+  if uf.unit.hasMagicka then disappearBar(uf.magickaBar.container) end
+  if uf.unit.hasStamina then disappearBar(uf.staminaBar.container) end
+  if uf.unit.hasMount then disappearBar(uf.mountStaminaBar.container) end
+ 
   local powerBarsHidden = false
   local mountBarHidden = false
 
