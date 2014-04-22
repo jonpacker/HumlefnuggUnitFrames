@@ -79,6 +79,14 @@ local getFrameHeight = function(uf, showMagicka, showStamina)
   return height
 end
 
+local shouldHidePowerBars = function(uf)
+  if not uf.opts.hidePowerWhenFull then return false end
+  if uf.unit.magicka ~= uf.unit.magickaMax then return false end
+  if uf.unit.stamina ~= uf.unit.staminaMax then return false end
+  if uf.unit.inCombat then return false end
+  return true
+end
+
 local createCollapseTimeline = function(uf)
   local timeline = ANIMATION_MANAGER:CreateTimeline()
   local frameCollapse = timeline:InsertAnimation(ANIMATION_SIZE, uf.container, 0)
@@ -98,8 +106,6 @@ local createCollapseTimeline = function(uf)
   disappearBar(uf.magickaBar.container)
   disappearBar(uf.staminaBar.container)
 
-  local magickaIsFull = uf.unit.magicka == uf.unit.magickaMax
-  local staminaIsFull = uf.unit.stamina == uf.unit.staminaMax
   local currentlyShowing = true
   local awaitingHide = false
 
@@ -124,21 +130,17 @@ local createCollapseTimeline = function(uf)
   end
 
   local updateBarsDisplaying = hf_debounce(function()
-    if magickaIsFull and staminaIsFull and currentlyShowing then
+    local shouldHide = shouldHidePowerBars(uf)
+    if shouldHide and currentlyShowing then
       setBarsDisplaying(false)
-    elseif (not magickaIsFull or not staminaIsFull) and not currentlyShowing then
+    elseif not shouldHide and not currentlyShowing then
       setBarsDisplaying(true)
     end
-  end, 500, true)
+  end, 100, true)
 
-  uf.unit:on('magicka-update', function(magicka, magickaMax)
-    magickaIsFull = magicka == magickaMax
-    updateBarsDisplaying()
-  end)
-  uf.unit:on('stamina-update', function(stamina, staminaMax)
-    staminaIsFull = stamina == staminaMax
-    updateBarsDisplaying()
-  end)
+  uf.unit:on('magicka-update', updateBarsDisplaying)
+  uf.unit:on('stamina-update', updateBarsDisplaying)
+  uf.unit:on('combat-state', updateBarsDisplaying)
 
   updateBarsDisplaying()
 end

@@ -27,6 +27,7 @@ local updateUnit = function(unit)
   unit.class = GetUnitClass(unit.unit)
   unit.race = GetUnitRace(unit.unit)
   unit.desc = GetUnitCaption(unit.unit)
+  unit.inCombat = IsUnitInCombat(unit.unit)
 
   if GetUnitDifficulty(unit.unit) then
     unit.difficulty = difficulties[GetUnitDifficulty(unit.unit)]
@@ -85,6 +86,13 @@ local listenForChanges = function(unit, changeEvent)
   unit:on('stats-update', function()
     updateUnit(unit)
   end)
+
+  if unit.unit == 'player' then
+    HFEventDelegate:on('combat-state', function(code, inCombat)
+      unit.inCombat = inCombat
+      unit:emit('combat-state', inCombat)
+    end)
+  end
 
   if changeEvent then
     HFEventDelegate:on(changeEvent, function() 
