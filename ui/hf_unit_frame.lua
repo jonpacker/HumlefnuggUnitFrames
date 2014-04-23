@@ -72,6 +72,27 @@ local renderUnitCaption = function(uf)
   uf.unitName:SetVerticalAlignment(TEXT_ALIGN_BOTTOM)
 end
 
+local renderMountBar = function(uf)
+  uf.mountStaminaBar = HFGrowbar:create(uf.container, {
+    fgColour = { 255/255, 180/255, 2/255, 1 };
+    bgColour = { 30/255, 30/255, 30/255, 1 };
+    width = uf.opts.width - uf.opts.padding * 2;
+    collapsible = uf.opts.hidePowerWhenFull;
+    height = uf.opts.mountStaminaHeight;
+  })
+  uf.mountStaminaBar.container:SetAnchor(BOTTOM, uf.container, BOTTOM, 0, -uf.opts.padding)
+
+  if uf.unit.mountName then
+    local mountName = WINDOW_MANAGER:CreateControl(getUniqueName("mountName"), uf.mountStaminaBar.container, CT_LABEL)
+    mountName:SetDimensions(uf.mountStaminaBar.container:GetWidth() / 2, uf.mountStaminaBar.opts.height)
+    mountName:SetSimpleAnchorParent(10, 0);
+    mountName:SetVerticalAlignment(TEXT_ALIGN_CENTER);
+    mountName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, uf.opts.mountNameFontSize))
+    mountName:SetColor(1, 1, 1, 1);
+    mountName:SetText(uf.unit.mountName);
+  end
+end
+
 local getFrameHeight = function(uf, showMagicka, showStamina, showMountStamina)
   local height = uf.opts.padding * 2 + uf.opts.healthHeight
   if showMagicka then height = height + uf.opts.magickaHeight + uf.opts.padding end
@@ -192,15 +213,7 @@ local render = function(uf, parent)
   end
 
   if uf.unit.hasMount then
-    uf.mountStaminaBar = HFGrowbar:create(container, {
-      fgColour = { 255/255, 180/255, 2/255, 1 };
-      bgColour = { 30/255, 30/255, 30/255, 1 };
-      width = barWidth;
-      collapsible = uf.opts.hidePowerWhenFull;
-      height = uf.opts.mountStaminaHeight;
-    })
-    -- anchoring bottom to bottom seems to be seriously broken. [Bugs, in my ESO?! It's more likely than you think.]
-    uf.mountStaminaBar.container:SetAnchor(BOTTOM, container, BOTTOM, 0, -uf.opts.padding)
+    renderMountBar(uf)
   end
 
   createCollapseTimeline(uf);
@@ -257,6 +270,7 @@ local defaults = {
   restingBg = { 54/255, 54/255, 54/255, 0.65 };
   combatBg = { 90/255, 54/255, 54/255, 0.9 };
   unitNameFontSize = 20;
+  mountNameFontSize = 16;
   unitCaptionFontSize = 14;
   healthChangeIndicatorFontSize = 22;
   dimUnitNameOnCombat = true;

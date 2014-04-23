@@ -90,6 +90,11 @@ local updateUnit = function(unit)
   if unit.hasMount then
     updatePower(unit, 'mountStamina')(GetUnitPower(unit.unit, POWERTYPE_MOUNT_STAMINA))
     unit.isMounted = unit.unit == 'player' and IsMounted()
+
+    if unit.unit == 'player' then
+      unit.mountName = GetStableSlotInfo(ACTIVE_MOUNT_INDEX)
+      unit.mountLevel = GetStableSlotMountStats(ACTIVE_MOUNT_INDEX)
+    end
   end
 end
 
