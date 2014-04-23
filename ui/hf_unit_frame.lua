@@ -100,28 +100,15 @@ local createCollapseTimeline = function(uf)
   local frameCollapse = timeline:InsertAnimation(ANIMATION_SIZE, uf.container, 0)
 
   frameCollapse:SetStartAndEndWidth(uf.container:GetWidth(), uf.container:GetWidth())
-  frameCollapse:SetStartAndEndHeight(getFrameHeight(uf, true, true), getFrameHeight(uf, false, false))
+  frameCollapse:SetStartAndEndHeight(getFrameHeight(uf, true, true, false), getFrameHeight(uf, false, false, false))
   frameCollapse:SetEasingFunction(ZO_EaseInOutCubic)
   frameCollapse:SetDuration(uf.opts.collapseAnimationDuration)
-
-  local disappearBar = function(bar)
-    local disappear = timeline:InsertAnimation(ANIMATION_ALPHA, bar, 0)
-    disappear:SetEasingFunction(ZO_EaseInOutCubic)
-    disappear:SetDuration(uf.opts.collapseAnimationDuration)
-    disappear:SetAlphaValues(1, 1) 
-    return disappear
-  end
-
-  local disappearMagicka, disappearStamina, disappearMount
-  if uf.unit.hasMagicka then disappearMagicka = disappearBar(uf.magickaBar.container) end
-  if uf.unit.hasStamina then disappearStamina = disappearBar(uf.staminaBar.container) end
-  if uf.unit.hasMount then disappearMount = disappearBar(uf.mountStaminaBar.container) end
  
   local powerBarsHidden = false
   local mountBarHidden = false
 
   local updateCurrentHeight = function(height)
-    --if timeline:IsPlaying() then timeline:Stop() end
+    if timeline:IsPlaying() then timeline:Stop() end
 
     local powerBarsShouldBeHidden = shouldHidePowerBars(uf)
     local mountBarShouldBeHidden = uf.unit.hasMount and not uf.unit.isMounted
@@ -129,45 +116,31 @@ local createCollapseTimeline = function(uf)
     if powerBarsShouldBeHidden and not powerBarsHidden then
       if uf.magickaBar then uf.magickaBar:collapse() end
       if uf.staminaBar then uf.staminaBar:collapse() end
-      --if disappearMagicka then disappearMagicka:SetAlphaValues(1, 0) end
-      --if disappearStamina then disappearStamina:SetAlphaValues(1, 0) end
       powerBarsHidden = true
     elseif not powerBarsShouldBeHidden and powerBarsHidden then
       if uf.magickaBar then uf.magickaBar:expand() end
       if uf.staminaBar then uf.staminaBar:expand() end
-      --if disappearMagicka then disappearMagicka:SetAlphaValues(0, 1) end
-      --if disappearStamina then disappearStamina:SetAlphaValues(0, 1) end
       powerBarsHidden = false
-    else
-      --local currentPowerAlpha = powerBarsHidden and 0 or 1
-      --if disappearMagicka then disappearMagicka:SetAlphaValues(currentPowerAlpha, currentPowerAlpha) end
-      --if disappearStamina then disappearStamina:SetAlphaValues(currentPowerAlpha, currentPowerAlpha) end
     end
 
     if mountBarShouldBeHidden and not mountBarHidden then
       uf.mountStaminaBar:collapse()
-      --disappearMount:SetAlphaValues(1, 0)
       mountBarHidden = true
     elseif not mountBarShouldBeHidden and mountBarHidden then
       uf.mountStaminaBar:expand()
-      --disappearMount:SetAlphaValues(0, 1)
       mountBarHidden = false
-    else
-      --local currentMountAlpha = mountBarHidden and 0 or 1
-
-      --if disappearMount then disappearMount:SetAlphaValues(currentAlpha, currentAlpha) end
     end
 
-    --frameCollapse:SetStartAndEndHeight(uf.container:GetHeight(), height)
-    --timeline:PlayFromStart()
+    frameCollapse:SetStartAndEndHeight(uf.container:GetHeight(), getFrameHeight(uf, not powerBarsHidden, not powerBarsHidden, not mountBarHidden))
+    timeline:PlayFromStart()
   end
 
-  local updateBarsDisplaying = function()
+  local updateBarsDisplaying = hf_debounce(function()
     local calculatedHeight = getCalculatedCurrentHeight(uf)
     if calculatedHeight ~= uf.container:GetHeight() then
       updateCurrentHeight(calculatedHeight)
     end
-  end
+  end, 100)
 
   uf.unit:on('magicka-update', updateBarsDisplaying)
   uf.unit:on('stamina-update', updateBarsDisplaying)
