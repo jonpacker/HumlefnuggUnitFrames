@@ -24,11 +24,12 @@ local animateWidthChange = function(bar)
 
     if timeline:IsPlaying() then timeline:PlayInstantlyToEnd() end
 
-    if immediate then
+    if immediate or bar.collapsed then
       bar.bar:SetWidth(bar.opts.width * value)
       return
     end
 
+    anim:SetStartAndEndHeight(bar.bar:GetHeight(), bar.bar:GetHeight())
     anim:SetStartAndEndWidth(bar.bar:GetWidth(), bar.opts.width * value)
     timeline:PlayFromStart()
   end)
@@ -63,7 +64,7 @@ local animateGlowOnChange = function(bar)
   local loseTimeline, loseDisappear, loseExpand = createGlowTimeline(bar.lose)
 
   bar:on("update", function(value, immediate)
-    if value == bar.value or immediate then return end
+    if value == bar.value or immediate or bar.collapsed then return end
 
     if gainTimeline:IsPlaying() then gainTimeline:PlayInstantlyToEnd() end
     if loseTimeline:IsPlaying() then loseTimeline:PlayInstantlyToEnd() end
@@ -73,10 +74,12 @@ local animateGlowOnChange = function(bar)
 
     if widthDiff < 0 then
       loseExpand.animatingTo = animateTo
+      loseExpand:SetStartAndEndHeight(bar.lose:GetHeight(), bar.lose:GetHeight())
       loseExpand:SetStartAndEndWidth(0, animateTo)
       loseTimeline:PlayFromStart()
     else
       gainExpand.animatingTo = animateTo
+      gainExpand:SetStartAndEndHeight(bar.gain:GetHeight(), bar.gain:GetHeight())
       gainExpand:SetStartAndEndWidth(0, animateTo)
       gainTimeline:PlayFromStart()
     end
@@ -127,11 +130,10 @@ local render = function(bar, parent)
 
   container:SetDimensions(bar.opts.width, bar.opts.height)
   container:SetColor(unpack(bar.opts.bgColour))
-  container:SetSimpleAnchorParent(0, 0)
 
   fillBar:SetDimensions(bar.opts.width, bar.opts.height)
   fillBar:SetColor(unpack(bar.opts.fgColour))
-  fillBar:SetSimpleAnchorParent(0, 0)
+  fillBar:SetAnchor(TOPLEFT, container, TOPLEFT, 0, 0)
 
   gain:SetDimensions(0, bar.opts.height)
   gain:SetColor(1, 1, 1, bar.opts.glowMaxAlpha);
@@ -183,6 +185,7 @@ function HFGrowbar:create(parent, opts)
   bar.opts = setmetatable(opts or {}, defaults)
   EventEmitter:new(bar)
   bar.value = 1
+  bar.collapsed = false
   render(bar, parent)
   return bar
 end
@@ -195,11 +198,13 @@ end
 function HFGrowbar:expand()
   if self.opts.collapsible then
     self:emit('expand')
+    self.collapsed = false
   end
 end
 
 function HFGrowbar:collapse()
   if self.opts.collapsible then
     self:emit('collapse')
+    self.collapsed = true
   end
 end
