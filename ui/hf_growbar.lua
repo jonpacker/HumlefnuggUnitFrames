@@ -95,17 +95,18 @@ local createCollapseTimeline = function(bar)
     anim:SetDuration(bar.opts.collapseTime)
     anim:SetStartAndEndWidth(control:GetWidth(), control:GetWidth())
     anim:SetStartAndEndHeight(control:GetHeight(), 0)
-    local disappear = timeline:InsertAnimation(ANIMATION_ALPHA, control, 0)
-    disappear:SetEasingFunction(bar.opts.collapseEasing)
-    disappear:SetDuration(bar.opts.collapseTime)
-    disappear:SetAlphaValues(1, 0)
     return anim
   end
 
+  local disappear = timeline:InsertAnimation(ANIMATION_ALPHA, bar.container, 0)
+  disappear:SetEasingFunction(bar.opts.collapseEasing)
+  disappear:SetDuration(bar.opts.collapseTime)
+  disappear:SetAlphaValues(bar.opts.bgColour[4], 0)
+
   local collapsedControls = { bar.container, bar.bar, bar.gain, bar.lose }
   local collapseAnims = {}
-  for i = 1, #collapsedControls do 
-    collapseAnims[i] = collapseControl(collapsedControls[i])
+  for i = 1, #collapsedControls do
+    collapseAnims[i] = collapseControl(collapsedControls[i]);
   end
 
   local updateWidths = function()
