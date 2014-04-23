@@ -121,40 +121,45 @@ local createCollapseTimeline = function(uf)
   local mountBarHidden = false
 
   local updateCurrentHeight = function(height)
+    --if timeline:IsPlaying() then timeline:Stop() end
+
     local powerBarsShouldBeHidden = shouldHidePowerBars(uf)
     local mountBarShouldBeHidden = uf.unit.hasMount and not uf.unit.isMounted
 
     if powerBarsShouldBeHidden and not powerBarsHidden then
       if uf.magickaBar then uf.magickaBar:collapse() end
       if uf.staminaBar then uf.staminaBar:collapse() end
-      if disappearMagicka then disappearMagicka:SetAlphaValues(1, 0) end
-      if disappearStamina then disappearStamina:SetAlphaValues(1, 0) end
+      --if disappearMagicka then disappearMagicka:SetAlphaValues(1, 0) end
+      --if disappearStamina then disappearStamina:SetAlphaValues(1, 0) end
       powerBarsHidden = true
     elseif not powerBarsShouldBeHidden and powerBarsHidden then
       if uf.magickaBar then uf.magickaBar:expand() end
       if uf.staminaBar then uf.staminaBar:expand() end
-      if disappearMagicka then disappearMagicka:SetAlphaValues(0, 1) end
-      if disappearStamina then disappearStamina:SetAlphaValues(0, 1) end
+      --if disappearMagicka then disappearMagicka:SetAlphaValues(0, 1) end
+      --if disappearStamina then disappearStamina:SetAlphaValues(0, 1) end
       powerBarsHidden = false
     else
-      if disappearMagicka then disappearMagicka:SetAlphaValues(1, 1) end
-      if disappearStamina then disappearStamina:SetAlphaValues(1, 1) end
+      --local currentPowerAlpha = powerBarsHidden and 0 or 1
+      --if disappearMagicka then disappearMagicka:SetAlphaValues(currentPowerAlpha, currentPowerAlpha) end
+      --if disappearStamina then disappearStamina:SetAlphaValues(currentPowerAlpha, currentPowerAlpha) end
     end
 
     if mountBarShouldBeHidden and not mountBarHidden then
       uf.mountStaminaBar:collapse()
-      disappearMount:SetAlphaValues(1, 0)
+      --disappearMount:SetAlphaValues(1, 0)
       mountBarHidden = true
     elseif not mountBarShouldBeHidden and mountBarHidden then
       uf.mountStaminaBar:expand()
-      disappearMount:SetAlphaValues(0, 1)
+      --disappearMount:SetAlphaValues(0, 1)
       mountBarHidden = false
     else
-      if disappearMount then disappearMount:SetAlphaValues(1, 1) end
+      --local currentMountAlpha = mountBarHidden and 0 or 1
+
+      --if disappearMount then disappearMount:SetAlphaValues(currentAlpha, currentAlpha) end
     end
 
-    frameCollapse:SetStartAndEndHeight(uf.container:GetHeight(), height)
-    timeline:PlayFromStart()
+    --frameCollapse:SetStartAndEndHeight(uf.container:GetHeight(), height)
+    --timeline:PlayFromStart()
   end
 
   local updateBarsDisplaying = function()
@@ -222,7 +227,7 @@ local render = function(uf, parent)
       height = uf.opts.mountStaminaHeight;
     })
     -- anchoring bottom to bottom seems to be seriously broken. [Bugs, in my ESO?! It's more likely than you think.]
-    uf.mountStaminaBar.container:SetAnchor(TOP, container, BOTTOM, 0, -1 * (uf.opts.padding + uf.opts.mountStaminaHeight))
+    uf.mountStaminaBar.container:SetAnchor(BOTTOM, container, BOTTOM, 0, -uf.opts.padding)
   end
 
   createCollapseTimeline(uf);
