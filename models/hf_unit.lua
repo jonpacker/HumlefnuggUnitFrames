@@ -119,6 +119,16 @@ local listenForChanges = function(unit, changeEvent)
     updateUnit(unit)
   end)
 
+  unit:on('gain-health-shield', function(value, max)
+    unit.healthShield, unit.healthShieldMax, unit.hasHealthShield = value, max, true
+  end)
+  unit:on('lose-health-shield', function()
+    unit.healthShield, unit.healthShieldMax, unit.hasHealthShield = nil, nil, false
+  end)
+  unit:on('update-health-shield', function(value, max)
+    unit.healthShield, unit.healthShieldMax = value, max
+  end)
+
   unit:on('mounted-update', function(mounted)
     unit.isMounted = mounted
   end)

@@ -3,6 +3,9 @@ HFEventDelegate:add(EVENT_STATS_UPDATED, "stats-update")
 HFEventDelegate:add(EVENT_MOUNTED_STATE_CHANGED, "mounted-update")
 HFEventDelegate:add(EVENT_MOUNTS_FULL_UPDATE, "mount-update")
 HFEventDelegate:add(EVENT_MOUNT_UPDATE, "mount-update")
+HFEventDelegate:add(EVENT_UNIT_ATTRIBUTE_VISUAL_ADDED, "add-visual") 
+HFEventDelegate:add(EVENT_UNIT_ATTRIBUTE_VISUAL_REMOVED, "remove-visual")
+HFEventDelegate:add(EVENT_UNIT_ATTRIBUTE_VISUAL_UPDATED , "update-visual")
 
 local eventSources = {}
 
@@ -45,6 +48,35 @@ function HFUnitEventSource(unit)
       es:emit("mount-update")
     end)
   end
+
+  HFEventDelegate:on("add-visual", function(event, targetUnit, unitAttributeVisual, statType, attributeType, powerType, value, maxValue)
+    if unit ~= targetUnit then return end
+    es:emit("add-visual", unitAttributeVisual, statType, attributeType, powerType, value, maxValue)
+  end)
+  HFEventDelegate:on("remove-visual", function(event, targetUnit, unitAttributeVisual, statType, attributeType, powerType, value, maxValue)
+    if unit ~= targetUnit then return end
+    es:emit("remove-visual", unitAttributeVisual, statType, attributeType, powerType, value, maxValue)
+  end)
+  HFEventDelegate:on("update-visual", function(event, targetUnit, unitAttributeVisual, statType, attributeType, powerType, oldValue, value, oldMax, maxValue)
+    if unit ~= targetUnit then return end
+    es:emit("update-visual", unitAttributeVisual, statType, attributeType, powerType, value, maxValue)
+  end)
+
+  es:on("add-visual", function(unitAttributeVisual, statType, attributeType, powerType, value, max)
+    if unitAttributeVisual == ATTRIBUTE_VISUAL_POWER_SHIELDING and powerType == POWERTYPE_HEALTH then
+      es:emit("gain-health-shield", value, max)
+    end
+  end)
+  es:on("remove-visual", function(unitAttributeVisual, statType, attributeType, powerType, value, max)
+    if unitAttributeVisual == ATTRIBUTE_VISUAL_POWER_SHIELDING and powerType == POWERTYPE_HEALTH then
+      es:emit("lose-health-shield")
+    end
+  end)
+  es:on("update-visual", function(unitAttributeVisual, statType, attributeType, powerType, value, max)
+    if unitAttributeVisual == ATTRIBUTE_VISUAL_POWER_SHIELDING and powerType == POWERTYPE_HEALTH then
+      es:emit("update-health-shield", value, max)
+    end
+  end)
 
   return es
 end
