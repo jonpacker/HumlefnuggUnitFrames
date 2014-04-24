@@ -253,7 +253,7 @@ local render = function(uf, parent)
 
   if uf.unit.hasMagicka then
     uf.magickaBar = HFGrowbar:create(container, {
-      fgColour = { 38/255, 94/255, 176/255, 1 };
+      fgColour = { 70/255, 100/255, 255/255, 1 };
       bgColour = { 30/255, 30/255, 30/255, 1 };
       width = barWidth;
       collapsible = uf.opts.hidePowerWhenFull;
