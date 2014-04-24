@@ -133,20 +133,23 @@ local render = function(bar, parent)
   local gain = WINDOW_MANAGER:CreateControl(getUniqueName("gain"), fillBar, CT_TEXTURE)
   local lose = WINDOW_MANAGER:CreateControl(getUniqueName("lose"), fillBar, CT_TEXTURE)
 
+  local mainAnchor = bar.opts.anchorToLeft and TOPLEFT or TOPRIGHT
+  local subAnchor = bar.opts.anchorToLeft and TOPRIGHT or TOPLEFT
+
   container:SetDimensions(bar.opts.width, bar.opts.height)
   container:SetColor(unpack(bar.opts.bgColour))
 
   fillBar:SetDimensions(bar.opts.width, bar.opts.height)
   fillBar:SetColor(unpack(bar.opts.fgColour))
-  fillBar:SetAnchor(TOPLEFT, container, TOPLEFT, 0, 0)
+  fillBar:SetAnchor(mainAnchor, container, mainAnchor, 0, 0)
 
   gain:SetDimensions(0, bar.opts.height)
   gain:SetColor(1, 1, 1, bar.opts.glowMaxAlpha);
-  gain:SetAnchor(TOPRIGHT, fillBar, TOPRIGHT, 0, 0)
+  gain:SetAnchor(subAnchor, fillBar, subAnchor, 0, 0)
 
   lose:SetDimensions(0, bar.opts.height)
   lose:SetColor(unpack(bar.opts.fgColour));
-  lose:SetAnchor(TOPLEFT, fillBar, TOPRIGHT, 0, 0)
+  lose:SetAnchor(mainAnchor, fillBar, subAnchor, 0, 0)
 
   bar.container = container
   bar.bar = fillBar
@@ -174,6 +177,7 @@ local defaults = {
   collapsible = false;
   collapseEasing = ZO_EaseInOutCubic;
   collapseTime = 300;
+  anchorToLeft = true;
 };
 defaults.__index = defaults;
 
