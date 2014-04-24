@@ -77,7 +77,7 @@ local updateUnit = function(unit)
 
   unit.hasMagicka = doesUnitUsePowerType(unit.unit, POWERTYPE_MAGICKA)
   unit.hasStamina = doesUnitUsePowerType(unit.unit, POWERTYPE_STAMINA)
-  unit.hasMount = doesUnitUsePowerType(unit.unit, POWERTYPE_MOUNT_STAMINA)
+  unit.hasMount = unit.unit == 'player' and doesUnitUsePowerType(unit.unit, POWERTYPE_MOUNT_STAMINA)
 
   if unit.hasStamina then
     updatePower(unit, 'stamina')(GetUnitPower(unit.unit, POWERTYPE_STAMINA))

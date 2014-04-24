@@ -81,7 +81,7 @@ local renderMountBar = function(uf)
     height = uf.opts.mountStaminaHeight;
   })
   uf.mountStaminaBar.container:SetAnchor(BOTTOM, uf.container, BOTTOM, 0, -uf.opts.padding)
-  uf.mountStaminaBar:collapse()
+  if not uf.unit.isMounted then uf.mountStaminaBar:collapse() end
 
   if uf.unit.mountName then
     local mountName = WINDOW_MANAGER:CreateControl(getUniqueName("mountName"), uf.mountStaminaBar.container, CT_LABEL)
@@ -108,7 +108,7 @@ end
 
 local shouldHidePowerBars = function(uf)
   if not uf.opts.hidePowerWhenFull then return false end
-  if not uf.unit.hasMagicka and not uf.unit.hasStamina then return false end
+  if not uf.unit.hasMagicka and not uf.unit.hasStamina then return true end
   if uf.unit.hasMagicka and uf.unit.magicka ~= uf.unit.magickaMax then return false end
   if uf.unit.hasStamina and uf.unit.stamina ~= uf.unit.staminaMax then return false end
   if uf.unit.inCombat then return false end
@@ -131,7 +131,9 @@ local createCollapseTimeline = function(uf)
   frameCollapse:SetDuration(uf.opts.collapseAnimationDuration)
  
   local powerBarsHidden = false
-  local mountBarHidden = false
+  local mountBarHidden = true
+
+  if uf.unit.hasMount then mountBarHidden = uf.mountStaminaBar.collapsed end
 
   local updateCurrentHeight = function()
     local calculatedHeight = getCalculatedCurrentHeight(uf)
@@ -141,7 +143,7 @@ local createCollapseTimeline = function(uf)
     if timeline:IsPlaying() then timeline:Stop() end
 
     local powerBarsShouldBeHidden = shouldHidePowerBars(uf)
-    local mountBarShouldBeHidden = uf.unit.hasMount and not uf.unit.isMounted
+    local mountBarShouldBeHidden = not (uf.unit.hasMount and uf.unit.isMounted)
 
     if powerBarsShouldBeHidden and not powerBarsHidden then
       if uf.magickaBar then uf.magickaBar:collapse() end
@@ -188,7 +190,7 @@ local render = function(uf, parent)
   local container = WINDOW_MANAGER:CreateControl(getUniqueName("container"), parent, CT_TEXTURE)
 
   container:SetColor(unpack(uf.opts.restingBg))
-  container:SetDimensions(uf.opts.width, getFrameHeight(uf, uf.unit.hasMagicka, uf.unit.hasStamina))
+  container:SetDimensions(uf.opts.width, getFrameHeight(uf, uf.unit.hasMagicka, uf.unit.hasStamina, uf.unit.hasMount))
 
   uf.container = container
 
@@ -309,7 +311,7 @@ end
 
 function HFUnitFrame:setCombatState(combat)
   if combat then
-    if self.opts.dimUnitNameOnCombat then self.unitName:SetAlpha(0.1) end
+    if self.opts.dimUnitNameOnCombat then self.unitName:SetAlpha(0.2) end
     self.container:SetColor(unpack(self.opts.combatBg))
   else
     if self.opts.dimUnitNameOnCombat then self.unitName:SetAlpha(1) end
