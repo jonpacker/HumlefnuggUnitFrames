@@ -98,6 +98,39 @@ local renderMountBar = function(uf)
   end
 end
 
+local createHealthShieldBar = function(uf)
+  uf.healthShieldBar = HFGrowbar:create(uf.container, {
+    fgColour = { 38/255, 100/255, 220/255, 1 },
+    bgColour = { 227/255, 94/255, 51/255, 1 },
+    width = 1;
+    height = uf.opts.healthHeight;
+  })
+  uf.healthShieldBar.container:SetAnchor(TOPRIGHT, uf.healthBar.container, TOPRIGHT, 0, 0)
+  uf.healthShieldBar.container:SetHidden(true)
+
+  local updateBarWidth = function(value, max) 
+    local shieldWidth = math.floor(max / uf.unit.healthEffectiveMax * uf.healthBar.container:GetWidth());
+    if shieldWidth ~= uf.healthShieldBar.container:GetWidth() then
+      uf.healthShieldBar.opts.width = shieldWidth
+      uf.healthShieldBar.container:SetWidth(shieldWidth)
+    end
+  end
+
+  uf.unit:on('gain-health-shield', function(value, max)
+    updateBarWidth(value, max)
+    HFUFDEBUGTEXT:SetText(tostring(value / max))
+    uf.healthShieldBar:update(value / max, true)
+    uf.healthShieldBar.container:SetHidden(false)
+  end)
+  uf.unit:on('update-health-shield', function(value, max)
+    updateBarWidth(value, max)
+    uf.healthShieldBar:update(value / max)
+  end)
+  uf.unit:on('lose-health-shield', function()
+    uf.healthShieldBar.container:SetHidden(true)
+  end)
+end
+
 local getFrameHeight = function(uf, showMagicka, showStamina, showMountStamina)
   local height = uf.opts.padding * 2 + uf.opts.healthHeight
   if showMagicka then height = height + uf.opts.magickaHeight + uf.opts.padding end
@@ -203,6 +236,8 @@ local render = function(uf, parent)
     height = uf.opts.healthHeight
   })
   uf.healthBar.container:SetAnchor(TOPLEFT, uf.container, TOPLEFT, uf.opts.padding, uf.opts.padding)
+
+  createHealthShieldBar(uf)
 
   if uf.unit.hasMagicka then
     uf.magickaBar = HFGrowbar:create(container, {
