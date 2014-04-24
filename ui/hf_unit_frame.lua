@@ -132,7 +132,11 @@ local createCollapseTimeline = function(uf)
   local powerBarsHidden = false
   local mountBarHidden = false
 
-  local updateCurrentHeight = function(height)
+  local updateCurrentHeight = function()
+    local calculatedHeight = getCalculatedCurrentHeight(uf)
+
+    if calculatedHeight == uf.container:GetHeight() then return end
+
     if timeline:IsPlaying() then timeline:Stop() end
 
     local powerBarsShouldBeHidden = shouldHidePowerBars(uf)
@@ -163,7 +167,11 @@ local createCollapseTimeline = function(uf)
   local updateBarsDisplaying = hf_debounce(function()
     local calculatedHeight = getCalculatedCurrentHeight(uf)
     if calculatedHeight ~= uf.container:GetHeight() then
-      updateCurrentHeight(calculatedHeight)
+      if calculatedHeight < uf.container:GetHeight() then
+        zo_callLater(updateCurrentHeight, 500)
+      else
+        updateCurrentHeight()
+      end
     end
   end, 100)
 

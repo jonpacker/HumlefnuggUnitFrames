@@ -94,7 +94,7 @@ local createCollapseTimeline = function(bar)
     anim:SetEasingFunction(bar.opts.collapseEasing)
     anim:SetDuration(bar.opts.collapseTime)
     anim:SetStartAndEndWidth(control:GetWidth(), control:GetWidth())
-    anim:SetStartAndEndHeight(control:GetHeight(), 0)
+    anim:SetStartAndEndHeight(bar.opts.height, 0)
     return anim
   end
 
