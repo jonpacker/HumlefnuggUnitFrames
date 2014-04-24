@@ -106,7 +106,7 @@ local createHealthShieldBar = function(uf)
     height = uf.opts.healthHeight;
     anchorToLeft = false;
   })
-  uf.healthShieldBar.container:SetAnchor(TOPRIGHT, uf.healthBar.container, TOPRIGHT, 0, 0)
+  uf.healthShieldBar.container:SetAnchor(TOPRIGHT, uf.healthBar.bar, TOPRIGHT, 0, 0)
   uf.healthShieldBar.container:SetHidden(true)
 
   local updateBarWidth = function(value, max) 
@@ -117,12 +117,24 @@ local createHealthShieldBar = function(uf)
     end
   end
 
+  local updateAnchorSide = function(value, max)
+      uf.healthShieldBar.container:ClearAnchors()
+    if uf.healthShieldBar.opts.width > (uf.unit.health / uf.unit.healthEffectiveMax) * uf.healthBar.opts.width then
+      uf.healthShieldBar.container:SetAnchor(TOPLEFT, uf.healthBar.bar, TOPLEFT, 0, 0)
+    else
+      uf.healthShieldBar.container:SetAnchor(TOPRIGHT, uf.healthBar.bar, TOPRIGHT, 0, 0)
+    end
+  end
+
   uf.unit:on('gain-health-shield', function(value, max)
     updateBarWidth(value, max)
+    updateAnchorSide()
     uf.healthShieldBar:update(value / max, true)
     uf.healthShieldBar.container:SetHidden(false)
   end)
+  uf.unit:on('health-update', updateAnchorSide)
   uf.unit:on('update-health-shield', function(value, max)
+    updateAnchorSide()
     updateBarWidth(value, max)
     uf.healthShieldBar:update(value / max)
   end)
