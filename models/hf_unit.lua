@@ -96,6 +96,17 @@ local updateUnit = function(unit)
       unit.mountLevel = GetStableSlotMountStats(ACTIVE_MOUNT_INDEX)
     end
   end
+
+  -- who thought of this function name! it's so silly! might as well add more redundancy: GetAllUnitAttributeVisualizerEffectEntityDataResultInfoNumberValuesArray!
+  local unitAttributeVisual, statType, attributeType, powerType, value, maxValue = GetAllUnitAttributeVisualizerEffectInfo("reticleover")
+  if (unitAttributeVisual == ATTRIBUTE_VISUAL_POWER_SHIELDING and powerType == POWERTYPE_HEALTH) then
+    unit.healthShield = value
+    unit.healthShieldMax = maxValue
+    unit.hasHealthShield = true
+  else
+    unit.healthShield, unit.healthShieldMax = nil, nil
+    unit.hasHealthShield = false
+  end
 end
 
 local listenForChanges = function(unit, changeEvent)

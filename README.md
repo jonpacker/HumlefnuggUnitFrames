@@ -8,6 +8,5 @@ Still to-do
 
 * Debuffs. At least research them, no idea if they're even possible.
 * Damage shield indicator
-* Research "effective max" with the powers
 * Make units frames top-level frames
 * Add configuration
