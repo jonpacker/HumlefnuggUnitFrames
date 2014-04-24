@@ -20,11 +20,11 @@ local updateIdentity = function(uf, parent)
 
   uf.container:SetHidden(false)
   uf.unitName:SetText(uf.unit.decoratedName)
-  uf.healthBar:update(uf.unit.health / uf.unit.healthMax, true)
+  uf.healthBar:update(uf.unit.health / uf.unit.healthEffectiveMax, true)
   updateUnitCaptionText(uf)
 
-  if uf.unit.hasMagicka then uf.magickaBar:update(uf.unit.magicka / uf.unit.magickaMax, true) end
-  if uf.unit.hasStamina then uf.staminaBar:update(uf.unit.stamina / uf.unit.staminaMax, true) end
+  if uf.unit.hasMagicka then uf.magickaBar:update(uf.unit.magicka / uf.unit.magickaEffectiveMax, true) end
+  if uf.unit.hasStamina then uf.staminaBar:update(uf.unit.stamina / uf.unit.staminaEffectiveMax, true) end
 end
 
 local renderHealthChangeIndicator = function(uf)
@@ -109,8 +109,8 @@ end
 local shouldHidePowerBars = function(uf)
   if not uf.opts.hidePowerWhenFull then return false end
   if not uf.unit.hasMagicka and not uf.unit.hasStamina then return true end
-  if uf.unit.hasMagicka and uf.unit.magicka ~= uf.unit.magickaMax then return false end
-  if uf.unit.hasStamina and uf.unit.stamina ~= uf.unit.staminaMax then return false end
+  if uf.unit.hasMagicka and uf.unit.magicka ~= uf.unit.magickaEffectiveMax then return false end
+  if uf.unit.hasStamina and uf.unit.stamina ~= uf.unit.staminaEffectiveMax then return false end
   if uf.unit.inCombat then return false end
   return true
 end
@@ -247,21 +247,21 @@ local render = function(uf, parent)
 end
 
 local listen = function(uf)
-  uf.unit:on('health-update', function(current, total)
+  uf.unit:on('health-update', function(current, total, effectiveTotal)
     updateUnitCaptionText(uf);
-    uf.healthBar:update(current / total);
+    uf.healthBar:update(current / effectiveTotal);
   end)
 
-  uf.unit:on('magicka-update', function(current, total)
-    uf.magickaBar:update(current / total);
+  uf.unit:on('magicka-update', function(current, total, effectiveTotal)
+    uf.magickaBar:update(current / effectiveTotal);
   end)
 
-  uf.unit:on('stamina-update', function(current, total)
-    uf.staminaBar:update(current / total);
+  uf.unit:on('stamina-update', function(current, total, effectiveTotal)
+    uf.staminaBar:update(current / effectiveTotal);
   end)
 
-  uf.unit:on('mount-stamina-update', function(current, total)
-    uf.mountStaminaBar:update(current / total);
+  uf.unit:on('mount-stamina-update', function(current, total, effectiveTotal)
+    uf.mountStaminaBar:update(current / effectiveTotal);
   end)
 
   uf.unit:on('stats-update', function() 
