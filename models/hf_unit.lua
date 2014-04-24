@@ -108,7 +108,7 @@ local listenForChanges = function(unit, changeEvent)
     updateUnit(unit)
   end)
 
-  unit:on('mount-update', function(mounted)
+  unit:on('mounted-update', function(mounted)
     unit.isMounted = mounted
   end)
 

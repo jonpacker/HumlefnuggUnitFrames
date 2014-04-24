@@ -166,7 +166,7 @@ local createCollapseTimeline = function(uf)
   uf.unit:on('magicka-update', updateBarsDisplaying)
   uf.unit:on('stamina-update', updateBarsDisplaying)
   uf.unit:on('combat-state', updateBarsDisplaying)
-  uf.unit.on('mount-update', updateBarsDisplaying)
+  uf.unit.on('mounted-update', updateBarsDisplaying)
 
   updateBarsDisplaying()
 end
