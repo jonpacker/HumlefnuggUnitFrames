@@ -81,6 +81,7 @@ local renderMountBar = function(uf)
     height = uf.opts.mountStaminaHeight;
   })
   uf.mountStaminaBar.container:SetAnchor(BOTTOM, uf.container, BOTTOM, 0, -uf.opts.padding)
+  uf.mountStaminaBar:collapse()
 
   if uf.unit.mountName then
     local mountName = WINDOW_MANAGER:CreateControl(getUniqueName("mountName"), uf.mountStaminaBar.container, CT_LABEL)
@@ -168,7 +169,7 @@ local createCollapseTimeline = function(uf)
     local calculatedHeight = getCalculatedCurrentHeight(uf)
     if calculatedHeight ~= uf.container:GetHeight() then
       if calculatedHeight < uf.container:GetHeight() then
-        zo_callLater(updateCurrentHeight, 500)
+        zo_callLater(updateCurrentHeight, 1000)
       else
         updateCurrentHeight()
       end
