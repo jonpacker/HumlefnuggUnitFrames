@@ -116,12 +116,10 @@ local createCollapseTimeline = function(bar)
   end
 
   bar:on('collapse', function() 
-    if timeline:IsPlaying() then timeline:PlayInstantlyToEnd() end
     updateWidths()
     timeline:PlayForward()
   end)
   bar:on('expand', function() 
-    if timeline:IsPlaying() then timeline:PlayInstantlyToEnd() end
     updateWidths()
     timeline:PlayBackward()
   end)
