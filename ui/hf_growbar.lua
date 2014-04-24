@@ -20,16 +20,16 @@ local animateWidthChange = function(bar)
   anim:SetStartAndEndHeight(bar.opts.height, bar.opts.height)
 
   bar:on("update", function(value, immediate)
-    if value == bar.value then return end
-
-    if timeline:IsPlaying() then timeline:PlayInstantlyToEnd() end
-
     if immediate or bar.collapsed then
       bar.bar:SetWidth(bar.opts.width * value)
       return
     end
 
-    anim:SetStartAndEndHeight(bar.bar:GetHeight(), bar.bar:GetHeight())
+    if value == bar.value then return end
+
+    if timeline:IsPlaying() then timeline:PlayInstantlyToEnd() end
+
+    anim:SetStartAndEndHeight(bar.bar:GetHeight(), bar.opts.height)
     anim:SetStartAndEndWidth(bar.bar:GetWidth(), bar.opts.width * value)
     timeline:PlayFromStart()
   end)
@@ -74,12 +74,12 @@ local animateGlowOnChange = function(bar)
 
     if widthDiff < 0 then
       loseExpand.animatingTo = animateTo
-      loseExpand:SetStartAndEndHeight(bar.lose:GetHeight(), bar.lose:GetHeight())
+      loseExpand:SetStartAndEndHeight(bar.lose:GetHeight(), bar.opts.height)
       loseExpand:SetStartAndEndWidth(0, animateTo)
       loseTimeline:PlayFromStart()
     else
       gainExpand.animatingTo = animateTo
-      gainExpand:SetStartAndEndHeight(bar.gain:GetHeight(), bar.gain:GetHeight())
+      gainExpand:SetStartAndEndHeight(bar.gain:GetHeight(), bar.opts.height)
       gainExpand:SetStartAndEndWidth(0, animateTo)
       gainTimeline:PlayFromStart()
     end

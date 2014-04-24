@@ -100,10 +100,11 @@ end
 
 local createHealthShieldBar = function(uf)
   uf.healthShieldBar = HFGrowbar:create(uf.container, {
-    fgColour = { 38/255, 100/255, 220/255, 1 },
+    fgColour = { 70/255, 100/255, 255/255, 1 },
     bgColour = { 227/255, 94/255, 51/255, 1 },
     width = 1;
     height = uf.opts.healthHeight;
+    anchorToLeft = false;
   })
   uf.healthShieldBar.container:SetAnchor(TOPRIGHT, uf.healthBar.container, TOPRIGHT, 0, 0)
   uf.healthShieldBar.container:SetHidden(true)
@@ -118,7 +119,6 @@ local createHealthShieldBar = function(uf)
 
   uf.unit:on('gain-health-shield', function(value, max)
     updateBarWidth(value, max)
-    HFUFDEBUGTEXT:SetText(tostring(value / max))
     uf.healthShieldBar:update(value / max, true)
     uf.healthShieldBar.container:SetHidden(false)
   end)
