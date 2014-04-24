@@ -5,8 +5,6 @@ HFUF = {
 function HFUF.init(eventCode, addOnName)
   if addOnName ~= "HumlefnuggUnitFrames" then return end
 
-  HFXB.settings = ZO_SavedVars:New("HFUFSettings", 2, nil, HFUF.defaults)
-
   ZO_PlayerAttributeHealth:SetHidden(true)
   ZO_PlayerAttributeMagicka:SetHidden(true)
   ZO_PlayerAttributeStamina:SetHidden(true)
