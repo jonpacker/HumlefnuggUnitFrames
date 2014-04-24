@@ -90,6 +90,10 @@ local renderMountBar = function(uf)
     mountName:SetFont(string.format("%s|%s|soft-shadow-thin", uf.opts.font, uf.opts.mountNameFontSize))
     mountName:SetColor(1, 1, 1, 1);
     mountName:SetText(uf.unit.mountName);
+
+    uf.unit:on('mount-update', function()
+      mountName:SetText(uf.unit.mountName);
+    end)
   end
 end
 

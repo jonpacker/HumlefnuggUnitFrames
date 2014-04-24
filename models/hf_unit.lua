@@ -112,6 +112,11 @@ local listenForChanges = function(unit, changeEvent)
     unit.isMounted = mounted
   end)
 
+  unit:on('mount-update', function()
+    unit.mountName = GetStableSlotInfo(ACTIVE_MOUNT_INDEX)
+    unit.mountLevel = GetStableSlotMountStats(ACTIVE_MOUNT_INDEX)
+  end)
+
   if unit.unit == 'player' then
     HFEventDelegate:on('combat-state', function(code, inCombat)
       unit.inCombat = inCombat

@@ -2,6 +2,7 @@ HFEventDelegate:add(EVENT_POWER_UPDATE, "power-update")
 HFEventDelegate:add(EVENT_STATS_UPDATED, "stats-update")
 HFEventDelegate:add(EVENT_MOUNTED_STATE_CHANGED, "mounted-update")
 HFEventDelegate:add(EVENT_MOUNTS_FULL_UPDATE, "mount-update")
+HFEventDelegate:add(EVENT_MOUNT_UPDATE, "mount-update")
 
 local eventSources = {}
 
@@ -41,6 +42,7 @@ function HFUnitEventSource(unit)
       es:emit("mounted-update", mounted)
     end)
     HFEventDelegate:on("mount-update", function(event)
+      es:emit("mount-update")
     end)
   end
 
