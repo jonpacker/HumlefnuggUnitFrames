@@ -1,11 +1,10 @@
 # Humlefnugg Unit Frames
 
-Yay! Working in progress. It's at a usable stage now, but it's missing many features.
+Minimalistic animated unit-frames for ESO.
 
-![](http://i.imgur.com/5LPMfv3.jpg)
+![](http://i.imgur.com/crb54QL.jpg)
 
-Still to-do
+Stuff still on my list to-do:
 
-* Debuffs. At least research them, no idea if they're even possible.
-* Make units frames top-level frames
-* Add configuration
+* Target-of-target, perhaps...
+* Add configuration, ability to move frames
