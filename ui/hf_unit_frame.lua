@@ -223,7 +223,7 @@ local render = function(uf, parent)
   local container = WINDOW_MANAGER:CreateControl(getUniqueName("container"), parent, CT_TEXTURE)
 
   container:SetColor(unpack(uf.opts.restingBg))
-  container:SetDimensions(uf.opts.width, getFrameHeight(uf, uf.unit.hasMagicka, uf.unit.hasStamina, uf.unit.hasMount))
+  container:SetDimensions(uf.opts.width, getFrameHeight(uf, uf.unit.hasMagicka, uf.unit.hasStamina, uf.unit.hasMount and uf.unit.isMounted))
 
   uf.container = container
 

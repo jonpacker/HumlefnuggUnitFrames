@@ -7,6 +7,5 @@ Yay! Working in progress. It's at a usable stage now, but it's missing many feat
 Still to-do
 
 * Debuffs. At least research them, no idea if they're even possible.
-* Damage shield indicator
 * Make units frames top-level frames
 * Add configuration
